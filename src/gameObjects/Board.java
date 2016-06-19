@@ -1,4 +1,4 @@
-package GameObjects;
+package gameObjects;
 
 public class Board {
 
