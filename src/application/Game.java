@@ -1,5 +1,7 @@
 package application;
 
+import java.util.ArrayList;
+
 import gameObjects.Character;
 import graphics.*;
 import javafx.animation.AnimationTimer;
@@ -22,7 +24,7 @@ public class Game extends Application{
 
 	private AnimationTimer updateTimer;
 
-	private Character character;
+	private ArrayList<Updateable> updateables = new ArrayList<>();
 
 	public Game() {
 
@@ -40,7 +42,8 @@ public class Game extends Application{
 				update();
 			}
 		};
-		character = new Character( 200, 200);
+		Character c = new Character( this, 200, 200 );
+		addUnit(c);
 
 		canvas = graphics.init();
 
@@ -52,7 +55,7 @@ public class Game extends Application{
 		graphics.start(primaryStage);
 		updateTimer.start();
 
-		graphics.addRenderable(character);
+
 
 		input = new InputHandeler( canvas ); // set focus on canvas node
 	}
@@ -60,9 +63,26 @@ public class Game extends Application{
 	public void update() {
 
 		InputState inputState = input.getState();
-		character.update(inputState);
+		for (Updateable object : updateables) {
+			System.out.println(object);
+			object.update(inputState);
+		}
+
 		physics.update();
 		graphics.update();
 	}
 
+	public void addRenderable( Renderable object ) {
+		graphics.addRenderable(object);
+	}
+	public void removeRenderable( Renderable object ) {
+		graphics.removeRenderable(object);
+	}
+
+	public void addUnit( Object unit ) {
+		if (unit instanceof Updateable)
+			updateables.add((Updateable)unit);
+		if (unit instanceof Renderable)
+			addRenderable((Renderable)unit);
+	}
 }

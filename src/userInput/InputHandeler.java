@@ -26,17 +26,25 @@ public class InputHandeler {
 
 
 		inputSource.setOnMousePressed( (event) -> {
+			setStateMouse(event.getSceneX(), event.getSceneY());
 			inputState.setMousePressed( event.getButton(), true );
+
 		});
 		inputSource.setOnMouseReleased( (event) -> {
+			setStateMouse(event.getSceneX(), event.getSceneY());
 			inputState.setMousePressed( event.getButton(), false);
+
 		});
 		inputSource.setOnMouseMoved( event -> {
-			inputState.setMouseX( event.getSceneX() );
-			inputState.setMouseY( event.getSceneY() );
+			setStateMouse(event.getSceneX(), event.getSceneY());
 		});
 
 
+	}
+
+	private void setStateMouse(double x, double y) {
+		inputState.setMouseX( x );
+		inputState.setMouseY( y );
 	}
 
 

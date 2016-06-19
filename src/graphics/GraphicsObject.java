@@ -2,7 +2,9 @@ package graphics;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Paint;
+import javafx.scene.transform.Rotate;
 
 /**
  *
@@ -28,6 +30,29 @@ public class GraphicsObject {
 
 	public void clear() {
 		renderComponent.clearRect(0,0, width, height);
+	}
+
+	/**
+	 *
+	 * @param image
+	 * @param cx
+	 * @param cy
+	 * @param ox
+	 * @param oy
+	 * @param rotation
+	 * ox, oy is the offset for the center of image. rotation is in radians
+	 */
+	public void drawImage(Image image, double cx, double cy, double ox, double oy, double rotation) {
+		GraphicsContext rc = renderComponent;
+		rc.save();
+
+		double rotationDegree = (180*rotation)/Math.PI;
+		Rotate r = new Rotate(rotationDegree, cx+ox, cy+oy);
+        rc.setTransform(r.getMxx(), r.getMyx(), r.getMxy(), r.getMyy(), r.getTx(), r.getTy());
+		//rc.translate(-ox, -oy);
+		//rc.rotate( (180*rotation)/Math.PI );
+		rc.drawImage(image, cx, cy);
+		rc.restore();
 	}
 
 	public void setFill( String color ) {

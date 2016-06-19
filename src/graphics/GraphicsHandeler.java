@@ -64,6 +64,9 @@ public class GraphicsHandeler {
 	public void addRenderable( Renderable object ) {
 		renderables.add(object);
 	}
+	public void removeRenderable( Renderable object ) {
+		renderables.remove(object);
+	}
 
 
 }
