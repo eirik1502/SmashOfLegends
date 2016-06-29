@@ -27,7 +27,7 @@ public class Game extends Application{
 	private ArrayList<Updateable> updateables = new ArrayList<>();
 
 	public Game() {
-
+		
 	}
 
 
@@ -84,5 +84,9 @@ public class Game extends Application{
 			updateables.add((Updateable)unit);
 		if (unit instanceof Renderable)
 			addRenderable((Renderable)unit);
+	}
+	
+	public static void main(String[] args) {
+		Game.launch("");
 	}
 }
