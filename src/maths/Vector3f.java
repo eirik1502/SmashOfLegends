@@ -1,4 +1,4 @@
-package com.thecherno.flappy.maths;
+package maths;
 
 public class Vector3f {
 

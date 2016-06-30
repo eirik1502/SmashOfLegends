@@ -2,49 +2,53 @@ package gameObjects;
 
 import application.Game;
 import application.Updateable;
-import graphics.GraphicsObject;
+import graphics.RenderObject;
 import graphics.Renderable;
-import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
+import graphics.Sprite;
 import userInput.InputState;
+
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFW.*;
+
 
 public class Character implements Renderable, Updateable {
 
 
-	private double x;
-	private double y;
-	private double r;
-	private double rotation;
+	private float x;
+	private float y;
+	private float radius;
+	private float rotation;
 
-	private Image image;
-
+	private Sprite sprite;
 
 	private Game game;
 
 	private int shootTimer = 0;
-	private int shootDelay = 60;
+	private int shootDelay = 60/10;
 
-	public Character( Game game, double startX, double startY ) {
+	public Character( Game game, float startX, float startY ) {
 		this.game = game;
 		setX(startX);
 		setY(startY);
-		r = 32;
-		image = new Image("guy.png");
+		radius = 32;
+		sprite = new Sprite("res/guy.png", 32, 32);
 	}
 
 	@Override
 	public void update(InputState inputState) {
-		if (inputState.isKeyboardPressed(KeyCode.A)) {
+		
+		//System.out.println("Char pos: " + getX() + ", " + getY());
+		
+		if (inputState.isKeyboardPressed(GLFW.GLFW_KEY_A)) {
 			addX(-2);
 		}
-		if (inputState.isKeyboardPressed(KeyCode.D)) {
+		if (inputState.isKeyboardPressed(GLFW.GLFW_KEY_D)) {
 			addX(2);
 		}
-		if (inputState.isKeyboardPressed(KeyCode.W)) {
+		if (inputState.isKeyboardPressed(GLFW.GLFW_KEY_W)) {
 			addY(-2);
 		}
-		if (inputState.isKeyboardPressed(KeyCode.S)) {
+		if (inputState.isKeyboardPressed(GLFW.GLFW_KEY_S)) {
 			addY(2);
 		}
 
@@ -52,17 +56,17 @@ public class Character implements Renderable, Updateable {
 		double deltaY = inputState.getMouseY() - getY();
 		double deltaX = inputState.getMouseX() - getX();
 		double currRotation;
-		if (deltaX == 0) currRotation = deltaY < 0? Math.PI/2 : 1.5*Math.PI;
+		if (deltaX == 0) currRotation = deltaY > 0? Math.PI/2 : 1.5*Math.PI;
 		else {
 			currRotation = Math.atan( deltaY/deltaX);
 			if (deltaX < 0) currRotation += Math.PI;
 		}
-		rotation = currRotation;
+		rotation = (float)currRotation;
 
 		if (shootTimer == 0) {
-			if (inputState.isMousePressed(MouseButton.PRIMARY)) {
+			if (inputState.isMousePressed(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
 				System.out.println("shoot");
-				Bullet bullet = new Bullet(getX(), getY(), rotation, 8);
+				Bullet bullet = new Bullet(getX(), getY(), rotation, 16);
 				game.addUnit( bullet);
 
 				shootTimer = shootDelay;
@@ -74,30 +78,28 @@ public class Character implements Renderable, Updateable {
 	}
 
 	@Override
-	public void render(GraphicsObject graphics) {
+	public void render(RenderObject graphics) {
 		//graphics.setFill("FF0000");
-
-		graphics.drawImage(image, getX(), getY(), 32, 32, rotation );
-		System.out.println(rotation);
+		graphics.drawSprite(sprite, getX(), getY(), rotation);
 	}
 
 
-	public void setX( double x) {
+	public void setX( float x) {
 		this.x = x;
 	}
-	public void setY( double y) {
+	public void setY( float y) {
 		this.y = y;
 	}
-	public void addX( double x) {
+	public void addX( float x) {
 		this.x += x;
 	}
-	public void addY( double y){
+	public void addY( float y){
 		this.y += y;
 	}
-	public double getX() {
+	public float getX() {
 		return x;
 	}
-	public double getY() {
+	public float getY() {
 		return y;
 	}
 

@@ -1,64 +1,110 @@
 package graphics;
 
+import static org.lwjgl.glfw.GLFW.*;
+
+import static org.lwjgl.opengl.GL11.*;
+
+import static org.lwjgl.system.MemoryUtil.NULL;
+
 import java.util.ArrayList;
 
-import javafx.application.Application;
-import javafx.scene.Group;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
+import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
+
 
 public class GraphicsHandeler {
 
 
-	public static final double WIDTH = 1600;
-	public static final double HEIGHT = 900;
+	public static final int WIDTH = 1600;
+	public static final int HEIGHT = 900;
 
-	private Group root;
-	private Canvas canvas;
-	private GraphicsObject graphicsObject;
+	private long window;
 
+	
+	private RenderObject renderObject;
+
+	
 	private ArrayList<Renderable> renderables = new ArrayList<>();
+	
 
+	
 	public GraphicsHandeler() {
 	}
+	
 
-	public Canvas init() {
-		root = new Group();
-		setupCanvas();
-		root.getChildren().add(canvas);
-		graphicsObject = new GraphicsObject( canvas.getGraphicsContext2D(), WIDTH, HEIGHT );
-		return canvas;
-	}
-
-	private void setupCanvas( ) {
-		Canvas canvas = new Canvas();
-		canvas.setWidth(WIDTH);
-		canvas.setHeight(HEIGHT);
-		this.canvas = canvas;
-	}
-
-	public void start(Stage primaryStage) {
-		try {
-			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
-			primaryStage.setScene(scene);
-			primaryStage.setResizable(false);
-			primaryStage.show();
+	public long init() {
+		
+		
+		if (!glfwInit()) {
+			System.err.println("Could not initialize GLFW!");
+			return -1;
 		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
+		
+		setupWindow();
+		
+		GL.createCapabilities(); //get opengl context
+		
+		glClearColor(0.2f, 0.5f, 0.3f, 1.0f);
+		
+ 		glEnable(GL_DEPTH_TEST);
+		//glActiveTexture(GL_TEXTURE1);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		System.out.println("OpenGL: " + glGetString(GL_VERSION));
+		
+		renderObject = new RenderObject();
+		
+		
+		return window;
 	}
 
-	public void update() {
-		graphicsObject.clear();
+
+	public void start() {
+		
+		glfwShowWindow(window);
+
+	}
+
+			
+	public void render() {
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
 		for (Renderable renderable : renderables) {
-			renderable.render( graphicsObject );
+			renderable.render( renderObject );
 		}
+		
+		glfwSwapBuffers(window);
+		
+		int error = glGetError();
+		if (error != GL_NO_ERROR)
+			System.err.println("GL error: " + error);
+	}
+	
+	private void setupWindow() {
+		glfwDefaultWindowHints(); // optional, the current window hints are already the default
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+        
+		window = glfwCreateWindow(WIDTH, HEIGHT, "Smash of Legends", NULL, NULL);
+		if (window == NULL) {
+			System.err.println("Could not create GLFW window!");
+			return;
+		}
+		
+        
+     // Get the resolution of the primary monitor
+        GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        // Center our window
+        glfwSetWindowPos(
+            window,
+            (vidmode.width() - WIDTH) / 2,
+            (vidmode.height() - HEIGHT) / 2
+        );
+		
+		
+		glfwMakeContextCurrent(window);
+        glfwSwapInterval(1);// Enable v-sync
 	}
 
 	public void addRenderable( Renderable object ) {

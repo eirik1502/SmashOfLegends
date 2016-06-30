@@ -1,34 +1,40 @@
 package gameObjects;
 
 import application.Updateable;
-import graphics.GraphicsObject;
+import graphics.RenderObject;
 import graphics.Renderable;
+import graphics.Sprite;
 import userInput.InputState;
 
 public class Bullet implements Renderable, Updateable{
 
 
-	private double x;
-	private double y;
-	private double r;
-	private double direction;
-	private double speed;
+	private float x;
+	private float y;
+	private float r;
+	private float direction;
+	private float speed;
+	
+	private static Sprite sprite;
+	
+	public static void loadSprite() {
+		sprite = new Sprite("res/bullet.png", 8, 40); //40, 8);
+	}
 
-
-	public Bullet(double startX, double startY, double direction, double speed) {
+	public Bullet(float startX, float startY, float direction, float speed) {
 		this.x = startX;
 		this.y = startY;
 		this.direction = direction;
 		this.speed = speed;
+		
 
 		r = 4;
 	}
 
 
 	@Override
-	public void render(GraphicsObject graphics) {
-		graphics.setFill("0000ff");
-		graphics.fillCircle(x, y, r );
+	public void render(RenderObject graphics) {
+		graphics.drawSprite(sprite, x, y, direction);
 
 	}
 

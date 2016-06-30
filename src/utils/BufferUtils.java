@@ -1,4 +1,4 @@
-package com.thecherno.flappy.utils;
+package utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

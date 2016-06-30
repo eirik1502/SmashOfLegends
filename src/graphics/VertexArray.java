@@ -1,15 +1,19 @@
-package com.thecherno.flappy.graphics;
+package graphics;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
-import com.thecherno.flappy.utils.BufferUtils;
+import utils.BufferUtils;
 
 public class VertexArray {
 	
-	private int vao, vbo, ibo, tbo;
+	private int vao; //vertex array object
+	private int vbo; //vertex buffer object
+	private int ibo; //indices buffer object
+	private int tbo; //texture buffer object
+	
 	private int count;
 	
 	public VertexArray(int count) {

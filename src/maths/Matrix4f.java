@@ -1,8 +1,8 @@
-package com.thecherno.flappy.maths;
+package maths;
 
 import java.nio.FloatBuffer;
 
-import com.thecherno.flappy.utils.BufferUtils;
+import utils.BufferUtils;
 
 public class Matrix4f {
 
@@ -52,7 +52,7 @@ public class Matrix4f {
 	
 	public static Matrix4f rotate(float angle) {
 		Matrix4f result = identity();
-		float r = (float) Math.toRadians(angle);
+		float r = angle;
 		float cos = (float) Math.cos(r);
 		float sin = (float) Math.sin(r);
 		

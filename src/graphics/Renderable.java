@@ -2,5 +2,5 @@ package graphics;
 
 public interface Renderable {
 
-	public void render( GraphicsObject graphics );
+	public void render( RenderObject graphics );
 }

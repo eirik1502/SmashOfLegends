@@ -1,9 +1,5 @@
 package userInput;
 
-import java.util.HashMap;
-
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
 
 public class InputState {
 
@@ -11,20 +7,20 @@ public class InputState {
     private double mouseX;
     private double mouseY;
 
-    private HashMap<KeyCode, Boolean> keyboardKeyHeld = new HashMap<>();
-    private HashMap<MouseButton, Boolean> mouseButtonHeld = new HashMap<>();
+    private boolean[] keyHeld = new boolean[256*2];
+    private boolean[] mouseButtonHeld = new boolean[16];
 
 
     public InputState() {
         mouseX = 0;
         mouseY = 0;
 
-        for (KeyCode keyCode : KeyCode.values()) {
-            keyboardKeyHeld.put( keyCode, false );
+        for (int i = 0; i < keyHeld.length; i++) {
+           keyHeld[i] = false;
         }
-        for (MouseButton mouseButton : MouseButton.values()) {
-            mouseButtonHeld.put( mouseButton, false );
-        }
+        for (int i = 0; i < mouseButtonHeld.length; i++) {
+            mouseButtonHeld[i] = false;
+         }
     }
 
 
@@ -34,11 +30,11 @@ public class InputState {
     public double getMouseY() {
         return mouseY;
     }
-    public boolean isMousePressed( MouseButton mouseButton ) {
-        return mouseButtonHeld.get(mouseButton);
+    public boolean isMousePressed( int mouseButton ) {
+        return mouseButtonHeld[mouseButton];
     }
-    public boolean isKeyboardPressed( KeyCode keyCode) {
-        return keyboardKeyHeld.get( keyCode );
+    public boolean isKeyboardPressed( int keyCode) {
+        return keyHeld[keyCode];
     }
 
 
@@ -49,11 +45,11 @@ public class InputState {
         this.mouseY = y;
     }
 
-    void setMousePressed( MouseButton mouseButton, boolean value ) {
-        mouseButtonHeld.put(mouseButton, value);
+    void setMousePressed( int mouseButton, boolean value ) {
+        mouseButtonHeld[mouseButton] = value;
     }
-    void setKeyboardPressed( KeyCode keyCode, boolean value ) {
-        keyboardKeyHeld.put(keyCode, value);
+    void setKeyboardPressed( int keyCode, boolean value ) {
+        keyHeld[keyCode] = value;
     }
 
 

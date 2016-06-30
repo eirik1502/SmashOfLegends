@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 
-public class TutMain implements Runnable {
+public class GLtestMain implements Runnable {
 	
 	private int width = 1600;
 	private int height = 900;

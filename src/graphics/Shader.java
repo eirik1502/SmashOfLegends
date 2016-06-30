@@ -1,38 +1,42 @@
-package com.thecherno.flappy.graphics;
+package graphics;
 
 import static org.lwjgl.opengl.GL20.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.thecherno.flappy.maths.Matrix4f;
-import com.thecherno.flappy.maths.Vector3f;
-import com.thecherno.flappy.utils.ShaderUtils;
+import maths.Matrix4f;
+import maths.Vector3f;
+import utils.ShaderUtils;
+
+
 
 public class Shader {
 	
 	public static final int VERTEX_ATTRIB = 0;
 	public static final int TCOORD_ATTRIB = 1;
 	
-	public static Shader BG, BIRD, PIPE, FADE;
+	//public static Shader BG, BIRD, PIPE, FADE;
 	
 	private boolean enabled = false;
 	
 	private final int ID;
 	private Map<String, Integer> locationCache = new HashMap<String, Integer>();
 	
-	public Shader(String vertex, String fragment) {
-		ID = ShaderUtils.load(vertex, fragment);
+	
+	
+	public Shader(String vertexPath, String fragmentPath) {
+		ID = ShaderUtils.load(vertexPath, fragmentPath);
 	}
 	
-	public static void loadAll() {
+	/*public static void loadAll() {
 		BG = new Shader("shaders/bg.vert", "shaders/bg.frag");
 		BIRD = new Shader("shaders/bird.vert", "shaders/bird.frag");
 		PIPE = new Shader("shaders/pipe.vert", "shaders/pipe.frag");
 		FADE = new Shader("shaders/fade.vert", "shaders/fade.frag");
-	}
+	}*/
 	
-	public int getUniform(String name) {
+	public int getUniformLocation(String name) {
 		if (locationCache.containsKey(name))
 			return locationCache.get(name);
 		
@@ -45,36 +49,36 @@ public class Shader {
 	}
 	
 	public void setUniform1i(String name, int value) {
-		if (!enabled) enable();
-		glUniform1i(getUniform(name), value);
+		if (!enabled) throw new IllegalStateException("Trying to use a shader while it is disabled");
+		glUniform1i(getUniformLocation(name), value);
 	}
 	
 	public void setUniform1f(String name, float value) {
-		if (!enabled) enable();
-		glUniform1f(getUniform(name), value);
+		if (!enabled) throw new IllegalStateException("Trying to use a shader while it is disabled");
+		glUniform1f(getUniformLocation(name), value);
 	}
 	
 	public void setUniform2f(String name, float x, float y) {
-		if (!enabled) enable();
-		glUniform2f(getUniform(name), x, y);
+		if (!enabled) throw new IllegalStateException("Trying to use a shader while it is disabled");
+		glUniform2f(getUniformLocation(name), x, y);
 	}
 	
 	public void setUniform3f(String name, Vector3f vector) {
-		if (!enabled) enable();
-		glUniform3f(getUniform(name), vector.x, vector.y, vector.z);
+		if (!enabled) throw new IllegalStateException("Trying to use a shader while it is disabled");
+		glUniform3f(getUniformLocation(name), vector.x, vector.y, vector.z);
 	}
 	
 	public void setUniformMat4f(String name, Matrix4f matrix) {
-		if (!enabled) enable();
-		glUniformMatrix4(getUniform(name), false, matrix.toFloatBuffer());
+		if (!enabled) throw new IllegalStateException("Trying to use a shader while it is disabled");
+		glUniformMatrix4fv(getUniformLocation(name), false, matrix.toFloatBuffer());
 	}
 	
-	public void enable() {
+	public void bind() {
 		glUseProgram(ID);
 		enabled = true;
 	}
 	
-	public void disable() {
+	public void unbind() {
 		glUseProgram(0);
 		enabled = false;
 	}
