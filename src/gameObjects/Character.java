@@ -5,13 +5,17 @@ import application.Updateable;
 import graphics.RenderObject;
 import graphics.Renderable;
 import graphics.Sprite;
+import physics.Collideable;
+import physics.PhRectangle;
+import physics.PhShape;
 import userInput.InputState;
+import static maths.TrigUtils.*;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFW.*;
 
 
-public class Character implements Renderable, Updateable {
+public class Character implements Renderable, Updateable, Collideable {
 
 
 	private float x;
@@ -66,7 +70,8 @@ public class Character implements Renderable, Updateable {
 		if (shootTimer == 0) {
 			if (inputState.isMousePressed(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
 				System.out.println("shoot");
-				Bullet bullet = new Bullet(getX(), getY(), rotation, 16);
+				float offset = 128;
+				Bullet bullet = new Bullet(game, getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation, 16+(float)Math.random());
 				game.addUnit( bullet);
 
 				shootTimer = shootDelay;
@@ -81,6 +86,11 @@ public class Character implements Renderable, Updateable {
 	public void render(RenderObject graphics) {
 		//graphics.setFill("FF0000");
 		graphics.drawSprite(sprite, getX(), getY(), rotation);
+	}
+	
+	@Override
+	public PhShape getPhShape() {
+		return new PhRectangle(x-radius, y-radius, radius*2, radius*2);
 	}
 
 

@@ -13,8 +13,10 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import java.util.ArrayList;
 import java.util.List;
 
+import gameObjects.Board;
 import gameObjects.Bullet;
 import gameObjects.Character;
+import gameObjects.Enemy;
 import graphics.*;
 import physics.*;
 import userInput.InputHandeler;
@@ -34,8 +36,11 @@ public class Game {
 	private ArrayList<Updateable> updateables = new ArrayList<>();
 	private boolean updatingElements = false;
 	private List<Updateable> addUpdateableBuffer = new ArrayList<>();
+	private List<Updateable> removeUpdateableBuffer = new ArrayList<>();
 	
 	private Character character;
+	public Enemy enemy;
+	private Board board;
 	
 	
 	public Game() {
@@ -51,8 +56,12 @@ public class Game {
 		input = new InputHandeler(window);
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
 
-		Character c = new Character( this, 200, 200 );
-		addUnit(c);
+		character = new Character( this, 200, 300 );
+		enemy = new Enemy(this, 1000, 600);
+		board = new Board();
+		addUnit(character);
+		addUnit(enemy);
+		addUnit(board);
 
 		Bullet.loadSprite();
 		
@@ -117,7 +126,21 @@ public class Game {
 		for (Updateable unit : this.addUpdateableBuffer) {
 			this.addUnit(unit);
 		}
+		for (Updateable unit : this.removeUpdateableBuffer) {
+			this.removeUnit(unit);
+		}
 		this.addUpdateableBuffer.clear();
+		this.removeUpdateableBuffer.clear();
+		
+		//fallen out of stage?
+		if (! PhysicsHandeler.isCollision(character, board)) {
+			character.setX(200);
+			character.setY(300);
+		}
+		if (! PhysicsHandeler.isCollision(enemy, board)) {
+			enemy.setX(1000);
+			enemy.setY(600);
+		}
 
 		//physics.update();
 	}
@@ -139,6 +162,25 @@ public class Game {
 				updateables.add((Updateable)unit);
 		if (unit instanceof Renderable)
 			addRenderable((Renderable)unit);
+	}
+	public void removeUnit(Object unit) {
+		if (unit instanceof Updateable) {
+			if (updatingElements) { //not added at all
+				removeUpdateableBuffer.add((Updateable)unit);
+				return;
+			}
+			else
+				updateables.remove((Updateable)unit);
+		}
+		if (unit instanceof Renderable)
+			removeRenderable((Renderable)unit);
+	}
+	
+	public Enemy getEnemy() {
+		return enemy;
+	}
+	public Character getCharacter() {
+		return character;
 	}
 	
 	

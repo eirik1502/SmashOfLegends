@@ -43,7 +43,7 @@ public class RenderObject {
 		VertexArray va = image.getVertexArray();
 		Texture tex = image.getTexture();
 		float cx = image.getCenterX();
-		float cy = image.getCenterX();
+		float cy = image.getCenterY();
 		
 		shader.bind();
 		tex.bind();

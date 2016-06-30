@@ -14,6 +14,15 @@ public class Sprite {
 	private float centerY;
 	
 	
+	public Sprite(String imageFilename, float centerX, float centerY, float depth) {
+		texture = new Texture( imageFilename);
+		width = texture.getWidth();
+		height = texture.getHeight();
+		this.depth = depth;
+		this.centerX = centerX;
+		this.centerY = centerY;
+		vertexArray = getRectangleVertexArray( width, height, depth);
+	}
 	public Sprite(String imageFilename, float centerX, float centerY) {
 		texture = new Texture( imageFilename);
 		width = texture.getWidth();
@@ -61,5 +70,9 @@ public class Sprite {
 	}
 	public float getCenterY() {
 		return centerY;
+	}
+	
+	public float getDepth() {
+		return depth;
 	}
 }

@@ -44,7 +44,7 @@ public class GraphicsHandeler {
 		
 		GL.createCapabilities(); //get opengl context
 		
-		glClearColor(0.2f, 0.5f, 0.3f, 1.0f);
+		glClearColor(0.2f, 0.3f, 0.6f, 1.0f);
 		
  		glEnable(GL_DEPTH_TEST);
 		//glActiveTexture(GL_TEXTURE1);
