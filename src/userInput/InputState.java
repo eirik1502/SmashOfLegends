@@ -4,8 +4,8 @@ package userInput;
 public class InputState {
 
 
-    private double mouseX;
-    private double mouseY;
+    private float mouseX;
+    private float mouseY;
 
     private boolean[] keyHeld = new boolean[256*2];
     private boolean[] mouseButtonHeld = new boolean[16];
@@ -24,10 +24,10 @@ public class InputState {
     }
 
 
-    public double getMouseX() {
+    public float getMouseX() {
         return mouseX;
     }
-    public double getMouseY() {
+    public float getMouseY() {
         return mouseY;
     }
     public boolean isMousePressed( int mouseButton ) {
@@ -38,10 +38,10 @@ public class InputState {
     }
 
 
-    void setMouseX( double x ) {
+    void setMouseX( float x ) {
         this.mouseX = x;
     }
-    void setMouseY( double y ) {
+    void setMouseY( float y ) {
         this.mouseY = y;
     }
 

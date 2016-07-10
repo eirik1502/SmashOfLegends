@@ -28,14 +28,14 @@ public class Character implements Renderable, Updateable, Collideable {
 	private Game game;
 
 	private int shootTimer = 0;
-	private int shootDelay = 60/10;
+	private int shootDelay = 60/7;
 
 	public Character( Game game, float startX, float startY ) {
 		this.game = game;
 		setX(startX);
 		setY(startY);
 		radius = 32;
-		sprite = new Sprite("res/guy.png", 32, 32);
+		sprite = new Sprite("res/frank_original_swg.png", 32, 32);
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class Character implements Renderable, Updateable, Collideable {
 		if (shootTimer == 0) {
 			if (inputState.isMousePressed(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
 				System.out.println("shoot");
-				float offset = 128;
-				Bullet bullet = new Bullet(game, getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation, 16+(float)Math.random());
+				float offset = 96;
+				Bullet bullet = new Bullet(game, getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation, 15+2*(float)Math.random());
 				game.addUnit( bullet);
 
 				shootTimer = shootDelay;

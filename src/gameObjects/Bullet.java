@@ -59,8 +59,8 @@ public class Bullet implements Renderable, Updateable, Collideable{
 
 		Enemy enemy = game.getEnemy();
 		if (PhysicsHandeler.isCollision(this, enemy)) {
-			float knockback = 32;
-			float direction = TrigUtils.pointDirection(x, y, enemy.getX(), enemy.getY());
+			float knockback = 64;
+			//float direction = TrigUtils.pointDirection(x, y, enemy.getX(), enemy.getY());
 			enemy.setX(enemy.getX() + (float)Math.cos(direction)*knockback);
 			enemy.setY(enemy.getY() + (float)Math.sin(direction)*knockback);
 			game.removeUnit(this);

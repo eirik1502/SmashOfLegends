@@ -54,16 +54,12 @@ public class GraphicsHandeler {
 		
 		renderObject = new RenderObject();
 		
+		glfwShowWindow(window);
 		
 		return window;
 	}
 
 
-	public void start() {
-		
-		glfwShowWindow(window);
-
-	}
 
 			
 	public void render() {

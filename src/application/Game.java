@@ -70,7 +70,6 @@ public class Game {
 
 	public void start() {
 
-		graphics.start();
 		
 		long lastTime = System.nanoTime();
 		double delta = 0.0;

@@ -30,8 +30,8 @@ public class InputHandeler {
 			}
 		});
 		glfwSetCursorPosCallback( inputSource, (window, xpos, ypos) -> {
-			inputState.setMouseX( xpos );
-			inputState.setMouseY( ypos );
+			inputState.setMouseX( (float)xpos );
+			inputState.setMouseY( (float)ypos );
 		});
         glfwSetKeyCallback(inputSource, (window, key, scancode, action, mods) -> {
             if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE ) {
