@@ -26,11 +26,14 @@ public class ClientNetworkOutput implements Runnable{
 
     private InputHandeler inputHandeler;
     
+    private float inputStateSendInterval;
     
-    public ClientNetworkOutput(DatagramSocket socket, Host serverHost,  InputHandeler inputHandeler, LogWriter log) {
+    
+    public ClientNetworkOutput(DatagramSocket socket, Host serverHost, float inputStateSendInterval, LogWriter log) {
     	this.socket = socket;
     	this.serverHost = serverHost;
-    	this.inputHandeler = inputHandeler;
+    	//this.inputHandeler = inputHandeler;
+    	this.inputStateSendInterval = inputStateSendInterval;
     	this.log = log;
     }
     
@@ -48,7 +51,7 @@ public class ClientNetworkOutput implements Runnable{
     	
 		long lastTime = System.nanoTime();
 		double delta = 0.0;
-		double ns = 1000000000.0 / 60.0;
+		double ns = 1000000000.0 / inputStateSendInterval;
 		long timer = System.currentTimeMillis();
 		int updates = 0;
 		int frames = 0;
@@ -79,23 +82,23 @@ public class ClientNetworkOutput implements Runnable{
     private void update() {
         //Send new message
 
-    	InputState inputState = inputHandeler.getState();
-    	sendInputState(inputState);
-    	log.flush();
+    	//InputState inputState = inputHandeler.getState();
+    	sendInputState();
+    	//log.flush();
         
     }
     
-    private void sendInputState(InputState input) {
+    private void sendInputState() {
     	
     	//get relevant input
-    	float mouseX = input.getMouseX();
-    	float mouseY = input.getMouseY();
-    	boolean mvUp = input.isKeyboardPressed(GLFW_KEY_W);
-    	boolean mvDown = input.isKeyboardPressed(GLFW_KEY_S);
-    	boolean mvLeft = input.isKeyboardPressed(GLFW_KEY_A);
-    	boolean mvRight = input.isKeyboardPressed(GLFW_KEY_D);
-    	boolean ac1 = input.isMousePressed(GLFW_MOUSE_BUTTON_LEFT);
-    	boolean ac2 = input.isMousePressed(GLFW_MOUSE_BUTTON_RIGHT);
+    	float mouseX = InputState.getMouseX();
+    	float mouseY = InputState.getMouseY();
+    	boolean mvUp = InputState.isKeyboardPressed(GLFW_KEY_W);
+    	boolean mvDown = InputState.isKeyboardPressed(GLFW_KEY_S);
+    	boolean mvLeft = InputState.isKeyboardPressed(GLFW_KEY_A);
+    	boolean mvRight = InputState.isKeyboardPressed(GLFW_KEY_D);
+    	boolean ac1 = InputState.isMousePressed(GLFW_MOUSE_BUTTON_LEFT);
+    	boolean ac2 = InputState.isMousePressed(GLFW_MOUSE_BUTTON_RIGHT);
     	
         try {
         	
@@ -115,7 +118,7 @@ public class ClientNetworkOutput implements Runnable{
 	        log.println("Bytes sending: " + out.size() );
 	        byte[] bytes = byteStream.toByteArray();
 	        log.print("Bytes to send: " + Arrays.toString(bytes) +"..");
-	        DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getPort());
+	        DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getReceivePort());
 	        socket.send(datagram);
 	        log.println("SUCSESS");
 	        

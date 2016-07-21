@@ -9,17 +9,28 @@ import org.json.simple.JSONObject;
 public class Server{
 
     public static int PORT_NUMBER = 7770;
+    //private static int PORT_NUMBER_SEND = 7771;
     public static int RECIEVE_MSG_BYTE_SIZE = 15;
     public static int SEND_JOIN_RESPONSE_BYTE_SIZE = 2;
     public static int SEND_GAME_DATA_BYTE_SIZE_MAX = 1+16*2+16*4;
     
+    
     public static String logFilepath = "src/network/serverLog.txt";
     
-    private DatagramSocket socket;
+    
+    private DatagramSocket recieveSocket;
+    private DatagramSocket sendSocket;
+    
     
     private Host[] connectedClients = new Host[2];
+	private final int activityTimeout = 1000*5;
+	//private int[] clientsActive = {activityTimeout, activityTimeout};
+	private TimerThread[] clientsTimeoutTimer = new TimerThread[2];
+	private boolean[] disconnectClientsFlag = {false, false};
+	
     //private int connectedClientCount = 0;
 
+	private ClientInputHandeler inputHandeler;
     private Thread clientInputThread;
 
     
@@ -35,6 +46,8 @@ public class Server{
     private float mouseY = 0;
     
     
+    private int messagesSendt = 0;
+    
     public static void main(String[] args) throws IOException {
         Server server = new Server();
         server.runServer();
@@ -47,14 +60,17 @@ public class Server{
         	
             try {
             	System.out.println("Starting server...");
-				socket = new DatagramSocket(PORT_NUMBER);
+				recieveSocket = new DatagramSocket(PORT_NUMBER);
+				sendSocket = new DatagramSocket();
+				//socket
 				System.out.println("Server ready to recieve...");
             
 			} catch (SocketException e) {
 				e.printStackTrace();
 			}
             
-        	clientInputThread = new Thread(new ClientInputHandeler(socket));
+            inputHandeler = new ClientInputHandeler(recieveSocket);
+        	clientInputThread = new Thread(inputHandeler);
         	clientInputThread.start();
     		
             long lastTime = System.nanoTime();
@@ -66,16 +82,6 @@ public class Server{
     		
             //Make new task
             while (true) {
-
-            	/*
-                ConcurrentLinkedDeque taskList = taskListHashMap.get(this.clientSocket);
-                Task task = (Task) taskList.peek();
-                if(task != null){
-                    out.println(task.getMessage());
-                    taskList.removeFirst();
-                    taskListHashMap.put(this.clientSocket,taskList);
-                }
-                */
             	
                 long now = System.nanoTime();
     			delta += (now - lastTime) / ns;
@@ -92,9 +98,10 @@ public class Server{
     			frames++;
     			if (System.currentTimeMillis() - timer > 1000) { //1 second has past
     				timer += 1000;
-    				System.out.println(updates + " ups, " + frames + " fps" + "---------------------------------------");
+    				System.out.println(updates + " ups, " + frames + " fps, " + messagesSendt + " msgs ---------------------------------------");
     				updates = 0;
     				frames = 0;
+    				messagesSendt = 0;
     			}
                
  
@@ -107,20 +114,27 @@ public class Server{
     }
     
     
-    
-    private void update() {
+    private void update() { //----- send packets
     	if (connectedClients[0] != null)
     	{
-	    	if (!client1InputBuffer.isEmpty()) {
+    		
+    		System.out.println("Input client 1 buffer size:" + client1InputBuffer.size());
+    		if (!client1InputBuffer.isEmpty()) {
+    		}
+    		else {
+    			
+    		}
+    		
+    		while (!client1InputBuffer.isEmpty()) {
 	    		ClientInput currentInput = client1InputBuffer.poll();
 	    		mouseX = currentInput.mouseX;
 	    		mouseY = currentInput.mouseY;
 	    		//System.out.println("Packet handeled: " + currentInput);
 	    	}
-	    	else {
-	    		System.out.println("Packet loss!!!!!!!!!!!!!!!!!!!!!!!!!");
-	    	}
-	    	System.out.println("Input client 1 buffer size:" + client1InputBuffer.size());
+//	    	else {
+//	    		System.out.println("Packet loss!!!!!!!!!!!!!!!!!!!!!!!!!");
+//	    	}
+	    	
 	    	
 	    	
 	    	if (this.sendStateCounter++ == 2) { //updates 20 times a second
@@ -141,14 +155,15 @@ public class Server{
 		    		
 		    		Host reciever = this.connectedClients[0];
 		    		
-		    		DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, reciever.getAddress(), reciever.getPort());
+		    		DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, reciever.getAddress(), reciever.getReceivePort());
 	    		
-					socket.send(datagram);
+					sendSocket.send(datagram);
 				}
 	    		catch (IOException e) {
 					e.printStackTrace();
 				}
 	    		
+	    		messagesSendt++;
 	    		sendStateCounter = 0;
 	    	}
     	}
@@ -175,26 +190,32 @@ public class Server{
             try {
                 //DataInputStream in = new DataInputStream(clientSocket.getInputStream());
                 //PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            	
+            	Host newClient;
+
 
                 while (true) {
 
                 	byte[] bytes = new byte[RECIEVE_MSG_BYTE_SIZE];
         			datagramPacket = new DatagramPacket(bytes, bytes.length);
         			
-        			socket.receive(datagramPacket); //wait for packet
-        			logWriter.println("Recieved packet..");
+        			socket.receive(datagramPacket); //--------------------------------wait for packet
+        			//logWriter.println("Recieved packet..");
         			
         			System.out.println("Server recieved pacet");
         			DataInputStream in = new DataInputStream( new ByteArrayInputStream(bytes) );
                 	byte msgType = in.readByte();
                 	
-                	Host newClient = new Host(datagramPacket);
+                	newClient = new Host(datagramPacket);
                 	
                 	
                 	switch(msgType) {
                 	case 0: //join request
                 		logWriter.println("..join request");
                 		boolean requestResponse = false;
+                		int receivePort = in.readInt();
+                		
+                		newClient.setReceivePort(receivePort);
                 		
                 		if (connectedClients[1] == null) {
                 			int clientNumber = 1;
@@ -205,6 +226,7 @@ public class Server{
                 			else
                 				connectedClients[1] = newClient;
                 			
+                			assignTimeoutTimer(clientNumber);
                 			requestResponse = true;
                 		}
                 		System.out.println("Client trying to join server, was accepted: " + Boolean.toString(requestResponse) + ", client: " + newClient.toString());
@@ -214,10 +236,10 @@ public class Server{
                 		break;
                 		
                 	case 1: //game data
-                		logWriter.println("..game data");
-                		logWriter.println("New client  : " + newClient);
-                    	logWriter.println("Comparing to: " + connectedClients[0]);
-                    	logWriter.flush();
+                		//logWriter.println("..game data");
+                		//logWriter.println("New client  : " + newClient);
+                    	//logWriter.println("Comparing to: " + connectedClients[0]);
+                    	//logWriter.flush();
                 		
                 		int clientNumber = this.getConnectedClientNumber(newClient);
                 		if (clientNumber == -1) {
@@ -225,6 +247,9 @@ public class Server{
                 			logWriter.println("Client not connected trying to send game data (type 1)");
                 			break; //not a connected client sending data
                 		}
+                		resetTimeoutTimer(clientNumber);
+                		//disconnectedsince last getClientNumb
+                		if (!isClientConnected(clientNumber)) break;
                 		
                 		float mouseX = in.readFloat();
                     	float mouseY = in.readFloat();
@@ -242,7 +267,7 @@ public class Server{
                     	else if (clientNumber == 1) {
                     		client2InputBuffer.add(input);
                     	}
-                    	logWriter.println("Data: " + input);
+                    	//logWriter.println("Data: " + input);
                     	
                 		break;
                 		
@@ -251,7 +276,7 @@ public class Server{
                 	}
                 	
                 	
-                	logWriter.flush();
+                	//logWriter.flush();
 
                 	//System.out.println("Got message:");
                 	//System.out.println("["+ msgType + " " + mouseX + " " + mouseY +" "+mvUp+" "+mvDown+" "+mvLeft+" "+mvRight +" "+ac1+" "+ac2+ "]");
@@ -262,15 +287,36 @@ public class Server{
                     Task t = new Task(inputLine, this.clientSocket);
                     addTask(t);*/
                 }
-            }catch (Exception e){
+            }
+            catch (IOException e){
             	e.printStackTrace();
             	System.out.println("Problems with serviceRequest");
             }
         }
         
+        private void assignTimeoutTimer(int clientNumber) {
+        	EmptyActionListener onTimeout = (() -> disconnectClient(clientNumber));
+        	TimerThread newTimer = new TimerThread(activityTimeout, onTimeout);
+        	clientsTimeoutTimer[clientNumber] = newTimer;
+        	clientsTimeoutTimer[clientNumber].start();
+        }
+        private void resetTimeoutTimer(int clientNumber) {
+        	clientsTimeoutTimer[clientNumber].reset();
+        }
+        
+        private void disconnectClient(int clientNumber) {
+        	connectedClients[clientNumber] = null;
+        	System.out.println("Client disconnected");
+        }
+        
+        private boolean isClientConnected(int clientNumber) {
+        	if (connectedClients[clientNumber] == null) return false;
+        	return true;
+        }
+        
         private int getConnectedClientNumber( Host client) {
-        	if (connectedClients[0].equals(client)) return 0;
-        	if (connectedClients[1].equals(client)) return 1;
+        	if (connectedClients[0] != null && connectedClients[0].equals(client)) return 0;
+        	if (connectedClients[1] != null && connectedClients[1].equals(client)) return 1;
         	else return -1;
         }
         
@@ -283,7 +329,7 @@ public class Server{
         
         private void socketSend( byte[] data, Host client) {
         	try {
-        		DatagramPacket packet = new DatagramPacket( data, data.length, client.getAddress(), client.getPort() );
+        		DatagramPacket packet = new DatagramPacket( data, data.length, client.getAddress(), client.getReceivePort() );
 				socket.send(packet);
 				
 			} catch (IOException e) {

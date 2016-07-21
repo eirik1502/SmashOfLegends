@@ -38,7 +38,7 @@ class ClientNetworkInput implements Runnable {
     			datagramPacket = new DatagramPacket(bytes, bytes.length);
     			
     			socket.receive(datagramPacket); //wait for packet
-    			log.println("Recieved packet..");
+    			//log.println("Recieved packet..");
     			
     			DataInputStream in = new DataInputStream( new ByteArrayInputStream(bytes) );
             	byte msgType = in.readByte();
@@ -48,7 +48,7 @@ class ClientNetworkInput implements Runnable {
             	switch(msgType) {
             		
             	case 1: //game data
-            		log.println("..game data");
+            		//log.println("..game data");
 
             		
             		float p1X = in.readFloat();
@@ -84,7 +84,7 @@ class ClientNetworkInput implements Runnable {
             	}
             	
             	
-            	log.flush();
+            	//log.flush();
 
             }
         }catch (IOException e){
@@ -104,7 +104,7 @@ class ClientNetworkInput implements Runnable {
     	}
     	ObjectsState nextState = this.objectsStateQueue.poll();
     	lastObjectsState = nextState;
-    	log.println("Returning next objectsState: " + nextState);
+    	//log.println("Returning next objectsState: " + nextState);
     	return nextState;
     }
 }

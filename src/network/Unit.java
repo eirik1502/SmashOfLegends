@@ -1,32 +1,28 @@
 package network;
 
-import graphics.RenderObject;
-import graphics.Renderable;
-import graphics.Sprite;
 
-public class Unit implements Renderable{
+import graphics.Sprite;
+import rooms.Entity;
+
+public class Unit extends Entity {
 
 	private Sprite sprite;
-	private float x;
-	private float y;
 	
 	public Unit(Sprite sprite, float x, float y) {
+		super(sprite, 0, 0, 0);
 		this.sprite = sprite;
 		this.x = x;
 		this.y = y;
 	}
 	
-	@Override
-	public void render(RenderObject graphics) {
-		graphics.drawSprite(sprite, x,  y, 0);
-		
-	}
+	
 
 	public float getX() {
 		return x;
 	}
 	public void setX(float x) {
 		this.x = x;
+		
 	}
 	public float getY() {
 		return y;

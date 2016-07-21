@@ -1,27 +1,27 @@
 package gameObjects;
 
-import application.Game;
-import application.Updateable;
-import graphics.RenderObject;
-import graphics.Renderable;
+import game.Game;
+import game.GameRoom;
 import graphics.Sprite;
 import maths.TrigUtils;
 import physics.Collideable;
 import physics.PhRectangle;
 import physics.PhShape;
 import physics.PhysicsHandeler;
+import rooms.Entity;
+import rooms.Room;
+import rooms.Updateable;
+import trash.RenderObject;
+import trash.Renderable;
+import trash.RoomObject;
+import trash.UpdateObject;
 import userInput.InputState;
 
-public class Bullet implements Renderable, Updateable, Collideable{
+public class Bullet extends Entity implements Updateable, Collideable{
 
 	
-	private Game game;
-
-	private float x;
-	private float y;
 	private float radius;
-	private float direction;
-	private float speed;
+	private float speed = 4;
 	
 	private int timer = 60;
 	
@@ -31,40 +31,37 @@ public class Bullet implements Renderable, Updateable, Collideable{
 		sprite = new Sprite("res/bullet_cyber.png", 40, 8); //40, 8);
 	}
 
-	public Bullet(Game game, float startX, float startY, float direction, float speed) {
-		this.game = game;
-		this.x = startX;
-		this.y = startY;
-		this.direction = direction;
+	public Bullet(float startX, float startY, float direction, float speed) {
+		super(sprite, startX, startY, direction);
 		this.speed = speed;
+
+	}
+
+
+	@Override
+	public void update() {
+
+		GameRoom groom = (GameRoom)room;
 		
-
-		radius = 4;
-	}
-
-
-	@Override
-	public void render(RenderObject graphics) {
-		graphics.drawSprite(sprite, x, y, direction);
-
-	}
-
-
-	@Override
-	public void update(InputState inputState) {
-		if (timer-- == 0) game.removeUnit(this);
+		if (timer-- == 0) room.removeEntity(this);
 			
-		x += Math.cos(direction)*speed;
-		y += Math.sin(direction)*speed;
-
-		Enemy enemy = game.getEnemy();
-		if (PhysicsHandeler.isCollision(this, enemy)) {
-			float knockback = 64;
-			//float direction = TrigUtils.pointDirection(x, y, enemy.getX(), enemy.getY());
-			enemy.setX(enemy.getX() + (float)Math.cos(direction)*knockback);
-			enemy.setY(enemy.getY() + (float)Math.sin(direction)*knockback);
-			game.removeUnit(this);
+		x += Math.cos(rotation)*speed;
+		y += Math.sin(rotation)*speed;
+		
+		Enemy enemy = groom.collideEnemy(this);
+		if (enemy != null) {
+			enemy.addHp(-34);
+			groom.removeEntity(this);
 		}
+
+//		Enemy enemy = game.getEnemy();
+//		if (PhysicsHandeler.isCollision(this, enemy)) {
+//			float knockback = 64;
+//			//float direction = TrigUtils.pointDirection(x, y, enemy.getX(), enemy.getY());
+//			enemy.setX(enemy.getX() + (float)Math.cos(direction)*knockback);
+//			enemy.setY(enemy.getY() + (float)Math.sin(direction)*knockback);
+//			game.removeUnit(this);
+//		}
 	}
 
 	@Override

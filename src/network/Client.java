@@ -3,9 +3,13 @@ package network;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import game.Game;
 import gameObjects.Enemy;
 import graphics.GraphicsHandeler;
+import graphics.GraphicsUtils;
 import graphics.Sprite;
+import rooms.Entity;
+import rooms.Text;
 import userInput.InputHandeler;
 import utils.LogWriter;
 
@@ -14,19 +18,20 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 
 import java.io.*;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
  
 public class Client {
 
 	
-	public static final Host serverHost = new Host("192.168.38.101", Server.PORT_NUMBER);//"192.168.38.101", Server.PORT_NUMBER);
+	public static final Host serverHost = new Host("192.168.38.102", Server.PORT_NUMBER, -1);//"192.168.38.101", Server.PORT_NUMBER);
 	
 	public static String logFilepath = "src/network/clientLog.txt";
 	
 	private LogWriter log;
 	
-	private DatagramSocket socket;
+	private DatagramSocket receiveSocket, sendSocket;
 	
 	private ClientNetworkOutput networkOutput;
 	private ClientNetworkInput networkInput;
@@ -34,26 +39,39 @@ public class Client {
 	private Thread networkInputThread;
     
 
-	private GraphicsHandeler graphicsHandeler;
+	//private GraphicsHandeler graphicsHandeler;
+    //private long window;
+    private Entity unit;
+    
+    private float inputStateSendInterval = 60.0f;
+    
+    
+    //game stuff
     private long window;
-    private Unit unit;
+    private InputHandeler inputHandeler;
+    private GraphicsHandeler graphicsHandeler;
+    
     
     
     public void start(){
         
     	log = new LogWriter(logFilepath);
-    	InputHandeler inputHandeler = setupOther(); //must be called before setting up network
-    	setupNetwork(inputHandeler);
+    	setupOther();//call this first
+    	setupNetwork();
     	
     	loop();
-
     }
     
-    private void setupNetwork(InputHandeler inputHandeler) {
+    private void connectToServer() {
+    }
+    
+    private void setupNetwork() {
     	try {
     		
     		log.print("About to create DatagramSocket.. ");
-			socket = new DatagramSocket();
+			receiveSocket = new DatagramSocket();
+			sendSocket = new DatagramSocket();
+			//System.out.println("sockets ports: " + receiveSocket.getPort() + ", " + sendSocket.get);
 			log.println("SUCSESS");
 			
 			
@@ -62,7 +80,7 @@ public class Client {
 	        boolean connected = false;
 	        int tries = 0;
 	        while (!connected) {
-	        	connected = connectToServer(serverHost, socket);
+	        	connected = connectToServer(serverHost, receiveSocket, sendSocket);
 	        	if (tries++ == 10) {
 	        		log.errPrintln("\nTried to connect to server " + (tries) + " times, no sucsess:");
 	        		log.errPrintln("-- server might be offline\n-- too many packets lost");
@@ -74,13 +92,13 @@ public class Client {
 	        log.flush();
 	        
 	        log.println("Setting up network output thread..");
-	        networkOutput = new ClientNetworkOutput(socket, serverHost, inputHandeler, log);
+	        networkOutput = new ClientNetworkOutput(sendSocket, serverHost, inputStateSendInterval,  log);
 	        networkOutputThread = new Thread(networkOutput);
 	        networkOutputThread.start();
 	        log.printlnSucsess("network output thread");
 	        
 	        log.println("Setting up network input thread..");
-	        networkInput = new ClientNetworkInput(socket, log);
+	        networkInput = new ClientNetworkInput(receiveSocket, log);
 	        networkInputThread = new Thread(networkInput);
 	        networkInputThread.start();
 	        log.printlnSucsess("network input thread");
@@ -91,17 +109,18 @@ public class Client {
 			System.exit(-1);
 		}
     }
+   
     
-    private InputHandeler setupOther() {
-    	graphicsHandeler = new GraphicsHandeler();
-    	window = graphicsHandeler.init();
+    private void setupOther() {
+    	window = GraphicsUtils.createWindowOpenGl(Game.WIDTH, Game.HEIGHT, "Smash of Legends");
+		graphicsHandeler = new GraphicsHandeler(window, Game.WIDTH, Game.HEIGHT);
+		inputHandeler = new InputHandeler(window);
  
     	Sprite sprite = new Sprite("res/frank_original_rifle.png", 32, 32);
     	unit = new Unit(sprite, 300, 300);
     	
-    	graphicsHandeler.addRenderable(unit);
-    	
-		return new InputHandeler(window);
+    	//graphicsHandeler.addRenderable(unit);
+
     }
     
     private void loop() {
@@ -144,30 +163,36 @@ public class Client {
         
     	ObjectsState objectsState = networkInput.getNextObjectsState();
     	CharacterState player1State = objectsState.getPlayer1State();
-    	float newX = player1State.getX();
-    	float newY = player1State.getY();
-    	unit.setX(newX);
-    	unit.setY(newY);
+    	
+    	unit.setX(player1State.getX());
+    	unit.setY(player1State.getY());
+    	unit.setRotation(player1State.getDirection());
     }
+    
     private void render() {
-    	graphicsHandeler.render();
+    	Entity[] e = {unit};
+    	graphicsHandeler.render(e, new Text[0]);
     }
     
     
-    private boolean connectToServer(Host serverHost, DatagramSocket socket) {
+    private boolean connectToServer(Host serverHost, DatagramSocket receiveSocket, DatagramSocket sendSocket) {
     	try {
 	    	byte messageType = 0;
-	    	byte[] bytes = new byte[1];
-	    	bytes[0] = messageType;
-	    	DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getPort());
-			socket.send(datagram);
+	    	ByteBuffer bbuffer = ByteBuffer.allocate(5);
+	    	bbuffer.put(messageType);
+	    	bbuffer.putInt(receiveSocket.getLocalPort());
+	    	byte[] bytes = bbuffer.array();
+	    	int a = 12;
+	    	
+	    	DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getReceivePort());
+			sendSocket.send(datagram);
 			System.out.println("Join request sendt");
 			
 			bytes = new byte[Server.SEND_JOIN_RESPONSE_BYTE_SIZE];
 			datagram = new DatagramPacket(bytes, bytes.length);
 			
-			socket.setSoTimeout(1000); //wait for 1 second
-			socket.receive(datagram);
+			receiveSocket.setSoTimeout(1000); //wait for 1 second
+			receiveSocket.receive(datagram);
 			
 			if (bytes[0] != 0) throw new IllegalStateException("Got game data before connection was established");
 			if (bytes[1] == 0) throw new IllegalStateException("Could not connect to server, server is full");
@@ -185,7 +210,7 @@ public class Client {
 		}
     	finally {
     		try {
-				socket.setSoTimeout(0);
+				receiveSocket.setSoTimeout(0);
 			}
     		catch (SocketException e) {
 				e.printStackTrace();
