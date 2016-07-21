@@ -11,10 +11,6 @@ import physics.PhysicsHandeler;
 import rooms.Entity;
 import rooms.Room;
 import rooms.Updateable;
-import trash.RenderObject;
-import trash.Renderable;
-import trash.RoomObject;
-import trash.UpdateObject;
 import userInput.InputState;
 
 public class Bullet extends Entity implements Updateable, Collideable{

@@ -2,9 +2,9 @@ package game;
 
 import rooms.Room;
 import rooms.Text;
-import trash.GrCircle;
-import trash.GrRectangle;
-import trash.ShapeRenderer;
+//import trash.GrCircle;
+//import trash.GrRectangle;
+//import trash.ShapeRenderer;
 
 import java.util.ArrayList;
 
@@ -36,25 +36,22 @@ public class GameRoom extends Room {
 	
 	@Override
 	public void load() {
-		Bullet.loadSprite();
-		Enemy.loadSprite();
-		Wall.loadSprite();
+//		Bullet.loadSprite();
+//		Enemy.loadSprite();
+//		Wall.loadSprite();
 		player = new Character(300f, 300f);
-		board = new Board();
+		//board = new Board();
 		
-		text = new Text("Heello world!", Font.getStandardFont(), 18, 200, 70, 0);
+		//text = new Text("Heello world!", Font.getStandardFont(), 18, 200, 70, 0);
 				
-		GrRectangle rect = new GrRectangle(50, 50, 0);
-		GrCircle circ = new GrCircle(25, 0);
-		rect1 = new ShapeRenderer(rect, Color.RED(), 1000, 200,0);
-		circ1 = new ShapeRenderer(circ, Color.PURPLE(), 200, 800, 0);
+
 	}
 	
 	@Override
 	public void start() {
-		super.addEntity(board);
 		super.addEntity(player);
-		super.addText(text);
+//		super.addEntity(board);
+//		super.addText(text);
 //		super.addEntity(board);
 //		super.addEntity(rect1);
 //		super.addEntity(circ1);
@@ -76,15 +73,14 @@ public class GameRoom extends Room {
 	@Override
 	public void update() {
 		if (!active)return;
-		//updatingEntities = true;
-		if (genEnemyTimer-- == 0) {
-			enemyWave++;
-			for(int i = 0; i < enemyWave; i++) {
-				genEnemy();
-			}
-			genEnemyTimer = this.genEnemyInterval;
-		}
-		text.setString("Wave: " + enemyWave);
+//		if (genEnemyTimer-- == 0) {
+//			enemyWave++;
+//			for(int i = 0; i < enemyWave; i++) {
+//				genEnemy();
+//			}
+//			genEnemyTimer = this.genEnemyInterval;
+//		}
+//		text.setString("Wave: " + enemyWave);
 		super.update();
 	}
 	

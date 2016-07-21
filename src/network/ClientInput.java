@@ -2,17 +2,20 @@ package network;
 
 public class ClientInput {
 
-	byte msgType;
-	float mouseX;
-	float mouseY;
-	boolean mvUp;
-	boolean mvDown;
-	boolean mvLeft;
-	boolean mvRight;
-	boolean ac1;
-	boolean ac2;
+	public final byte msgType;
+	public final float mouseX;
+	public final float mouseY;
+	public final boolean mvUp;
+	public final boolean mvDown;
+	public final boolean mvLeft;
+	public final boolean mvRight;
+	public final boolean ac1;
+	public final boolean ac2;
 	
 	
+	public ClientInput() {
+		this((byte)0, 0f, 0f, false, false, false, false, false, false);
+	}
 	public ClientInput( byte msgType, float mouseX, float mouseY, boolean mvUp,
 						boolean mvDown,	boolean mvLeft,	boolean mvRight, boolean ac1, boolean ac2 ) {
 	this.msgType = msgType;

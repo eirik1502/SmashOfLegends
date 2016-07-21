@@ -7,6 +7,7 @@ import physics.PhRectangle;
 import physics.PhShape;
 import physics.PhysicsHandeler;
 import rooms.Entity;
+import rooms.RelevantInputState;
 import rooms.Room;
 import rooms.Text;
 import rooms.Updateable;
@@ -33,48 +34,47 @@ public class Character extends Entity implements Updateable, Collideable {
 	
 
 	public Character( float startX, float startY ) {
-		super(new Sprite("res/frank_3_shotgun_strip13.png", 13, 40, 32, 0), 200, 100, 0);
+		super(null, 200, 100, 0);
+		//new Sprite("res/frank_3_shotgun_strip13.png", 13, 40, 32, 0)
 		setX(startX);
 		setY(startY);
 		radius = 32;
 		
-		text = new Text("", Font.getStandardFont(), 18, getX(), getY()-16, 0f);
+		//text = new Text("", Font.getStandardFont(), 18, getX(), getY()-16, 0f);
 		
-		super.getSprite().setImageSpeed(0);
-		getSprite().setOnAnimationEnd(sprite->{sprite.setImageSpeed(0);});
+		//super.getSprite().setImageSpeed(0);
+		//getSprite().setOnAnimationEnd(sprite->{sprite.setImageSpeed(0);});
 	}
 	
 	@Override
 	public void start() {
 	}
 	
-	
 
 	@Override
 	public void update() {
-		
 		super.update();
 		
 		GameRoom groom = (GameRoom)room;
-		
+		RelevantInputState is = room.getInputState();
 		
 		float lastX = x;
 		float lastY = y;
 		
 		float moveSpeed = 3;
-		if (InputState.isKeyboardPressed(GLFW.GLFW_KEY_A)) {
+		if (is.isMoveLeft()) {
 			addX(-moveSpeed);
 
 		}
-		if (InputState.isKeyboardPressed(GLFW.GLFW_KEY_D)) {
+		if (is.isMoveRight()) {
 			addX(moveSpeed);
 
 		}
-		if (InputState.isKeyboardPressed(GLFW.GLFW_KEY_W)) {
+		if (is.isMoveUp()) {
 			addY(-moveSpeed);
 
 		}
-		if (InputState.isKeyboardPressed(GLFW.GLFW_KEY_S)) {
+		if (is.isMoveDown()) {
 			addY(moveSpeed);
 
 		}
@@ -86,18 +86,18 @@ public class Character extends Entity implements Updateable, Collideable {
 			}
 		};
 		
-		if (groom.collideBoard(baundaryBox)) {
-			x = lastX;
-			y = lastY;
-		}
+//		if (groom.collideBoard(baundaryBox)) {
+//			x = lastX;
+//			y = lastY;
+//		}
 		
-		text.setString("reloading, " + Integer.toString(shootTimer));
-		text.setX(x-64);
-		text.setY(y-64);
+//		text.setString("reloading, " + Integer.toString(shootTimer));
+//		text.setX(x-64);
+//		text.setY(y-64);
 
 
-		double deltaY = InputState.getMouseY() - getY();
-		double deltaX = InputState.getMouseX() - getX();
+		double deltaY = is.getMouseY() - getY();
+		double deltaX = is.getMouseX() - getX();
 		double currRotation;
 		if (deltaX == 0) currRotation = deltaY > 0? Math.PI/2 : 1.5*Math.PI;
 		else {
@@ -106,20 +106,20 @@ public class Character extends Entity implements Updateable, Collideable {
 		}
 		super.rotation = (float)currRotation;
 
-		if (shootTimer == 0) {
-			if (InputState.isMousePressed(GLFW.GLFW_MOUSE_BUTTON_LEFT)) {
-				float bulletSpeed = 15+2*(float)Math.random();
-				float offset = 96;
-				Bullet bullet = new Bullet(getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation, bulletSpeed);
-				sprite.setImageSpeed(1);
-				room.addEntity( bullet);
-
-				shootTimer = shootDelay;
-			}
-		}
-		else {
-			shootTimer--;
-		}
+//		if (shootTimer == 0) {
+//			if (is.isAction1()) {
+//				float bulletSpeed = 15+2*(float)Math.random();
+//				float offset = 96;
+//				Bullet bullet = new Bullet(getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation, bulletSpeed);
+//				sprite.setImageSpeed(1);
+//				room.addEntity( bullet);
+//
+//				shootTimer = shootDelay;
+//			}
+//		}
+//		else {
+//			shootTimer--;
+//		}
 	}
 
 	

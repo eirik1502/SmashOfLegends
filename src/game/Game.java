@@ -20,8 +20,10 @@ import gameObjects.Character;
 import gameObjects.Enemy;
 import graphics.*;
 import network.Client;
+import network.ClientInput;
 import physics.*;
 import rooms.Entity;
+import rooms.RelevantInputState;
 import rooms.Room;
 import rooms.RoomHandeler;
 import rooms.Text;
@@ -42,7 +44,7 @@ public class Game {
 	
 	private RoomHandeler roomHandeler;
 	
-	private long window;
+	//private long window;
 
 	
 	
@@ -54,7 +56,7 @@ public class Game {
 
 	public void init() {
 		
-		physicsHandeler = new PhysicsHandeler();
+		//physicsHandeler = new PhysicsHandeler();
 		
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
 
@@ -73,64 +75,69 @@ public class Game {
 
 	public void start() {
 
+		roomHandeler.start();
 		
+//		long lastTime = System.nanoTime();
+//		double delta = 0.0;
+//		double ns = 1000000000.0 / 60.0;
+//		long timer = System.currentTimeMillis();
+//		int updates = 0;
+//		int frames = 0;
+//		
+//		while(true) {//!glfwWindowShouldClose(window)) {
+//			
+//			long now = System.nanoTime();
+//			delta += (now - lastTime) / ns;
+//			lastTime = now;
+//			if (delta >= 1.0) {
+//				
+//				update();
+//				
+//				updates++;
+//				delta--;
+//			}
+//			
+//			//no render
+//			
+//			frames++;
+//			if (System.currentTimeMillis() - timer > 1000) {
+//				timer += 1000;
+//				System.out.println(updates + " ups, " + frames + " fps");
+//				updates = 0;
+//				frames = 0;
+//			}
+//		}
 		
-		long lastTime = System.nanoTime();
-		double delta = 0.0;
-		double ns = 1000000000.0 / 60.0;
-		long timer = System.currentTimeMillis();
-		int updates = 0;
-		int frames = 0;
-		
-		while(!glfwWindowShouldClose(window)) {
-			
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
-			if (delta >= 1.0) {
-				
-				update();
-				
-				updates++;
-				delta--;
-			}
-			
-			
-			frames++;
-			if (System.currentTimeMillis() - timer > 1000) {
-				timer += 1000;
-				System.out.println(updates + " ups, " + frames + " fps");
-				updates = 0;
-				frames = 0;
-			}
-		}
 	
-		glfwDestroyWindow(window);
-		glfwTerminate();
+		//glfwDestroyWindow(window);
+		//glfwTerminate();
 
 		
 		
 	}
 
 	
-	public void update() {
-		glfwPollEvents();
-		
-		roomHandeler.update();
+	public void update(ClientInput input) {
+		//glfwPollEvents();
+		RelevantInputState convertedInput = new RelevantInputState(
+				input.mouseX, input.mouseY, input.mvUp, input.mvDown, input.mvLeft, input.mvRight, input.ac1, input.ac2);
+		roomHandeler.update(convertedInput);
 	}
 
-
-	public void render() {
-		Entity[] entities = roomHandeler.getEntities();
-		Text[] texts = roomHandeler.getTexts();
-		graphicsHandeler.render(entities, texts);
+	public Entity[] getEntities() {
+		return roomHandeler.getEntities();
 	}
+//	public void render() {
+//		Entity[] entities = roomHandeler.getEntities();
+//		Text[] texts = roomHandeler.getTexts();
+//		graphicsHandeler.render(entities, texts);
+//	}
 	
 	
 	
-	public static void main(String[] args) {
-		Game game = new Game();
-		game.init();
-		game.start();
-	}
+//	public static void main(String[] args) {
+//		Game game = new Game();
+//		game.init();
+//		game.start();
+//	}
 }

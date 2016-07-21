@@ -6,6 +6,9 @@ import java.util.concurrent.*;
 
 import org.json.simple.JSONObject;
 
+import game.Game;
+import rooms.Entity;
+
 public class Server{
 
     public static int PORT_NUMBER = 7770;
@@ -26,7 +29,7 @@ public class Server{
 	private final int activityTimeout = 1000*5;
 	//private int[] clientsActive = {activityTimeout, activityTimeout};
 	private TimerThread[] clientsTimeoutTimer = new TimerThread[2];
-	private boolean[] disconnectClientsFlag = {false, false};
+	//private boolean[] disconnectClientsFlag = {false, false};
 	
     //private int connectedClientCount = 0;
 
@@ -38,7 +41,8 @@ public class Server{
     
     private ConcurrentLinkedDeque<ClientInput> client1InputBuffer = new ConcurrentLinkedDeque<>();
     private ConcurrentLinkedDeque<ClientInput> client2InputBuffer = new ConcurrentLinkedDeque<>();
-
+    private ClientInput lastInput = new ClientInput();
+    
     
     private PrintWriter logWriter;
     
@@ -48,12 +52,22 @@ public class Server{
     
     private int messagesSendt = 0;
     
+    
+    
+    private Game game;
+    
+    
     public static void main(String[] args) throws IOException {
         Server server = new Server();
         server.runServer();
     }
 
     public void runServer() {
+    	
+    	game = new Game();
+    	game.init();
+    	game.start();
+    	
         try {
 
         	logWriter = new PrintWriter(logFilepath);
@@ -126,11 +140,10 @@ public class Server{
     		}
     		
     		while (!client1InputBuffer.isEmpty()) {
-	    		ClientInput currentInput = client1InputBuffer.poll();
-	    		mouseX = currentInput.mouseX;
-	    		mouseY = currentInput.mouseY;
+	    		lastInput = client1InputBuffer.poll();
 	    		//System.out.println("Packet handeled: " + currentInput);
 	    	}
+    		game.update(lastInput);
 //	    	else {
 //	    		System.out.println("Packet loss!!!!!!!!!!!!!!!!!!!!!!!!!");
 //	    	}
@@ -138,13 +151,15 @@ public class Server{
 	    	
 	    	
 	    	if (this.sendStateCounter++ == 2) { //updates 20 times a second
+	    		Entity[] entities = game.getEntities();
+	    		Entity e = entities[0];
 	    		try {
 	    			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(Server.RECIEVE_MSG_BYTE_SIZE);
 	            	DataOutputStream out = new DataOutputStream( byteStream );
 	            	out.writeByte(1); //type
-	            	out.writeFloat(mouseX);
-	            	out.writeFloat(mouseY);
-	            	out.writeFloat(0);
+	            	out.writeFloat(e.getX());
+	            	out.writeFloat(e.getY());
+	            	out.writeFloat(e.getRotation());
 	            	out.writeFloat(0);
 	            	out.writeFloat(0);
 	            	out.writeFloat(0);
@@ -159,8 +174,8 @@ public class Server{
 	    		
 					sendSocket.send(datagram);
 				}
-	    		catch (IOException e) {
-					e.printStackTrace();
+	    		catch (IOException e1) {
+					e1.printStackTrace();
 				}
 	    		
 	    		messagesSendt++;
@@ -322,7 +337,7 @@ public class Server{
         
         private void sendJoinRequestResponse( Host client, boolean accept ) {
         	byte[] data = new byte[2];
-        	data[0] = 0;
+        	data[0] = 0;//message type
         	data[1] = (byte) (accept? 1 : 0); //request is accepted;
         	socketSend(data, client);
         }
