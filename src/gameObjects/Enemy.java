@@ -9,8 +9,6 @@ import physics.PhRectangle;
 import physics.PhShape;
 import rooms.Entity;
 import rooms.Updateable;
-import trash.RenderObject;
-import trash.Renderable;
 import userInput.InputState;
 
 public class Enemy extends Entity implements Updateable, Collideable {
@@ -25,13 +23,9 @@ public class Enemy extends Entity implements Updateable, Collideable {
 	private float speed = 2;
 	
 	
-	private static Sprite sprite;
-	public static void loadSprite() {
-		sprite = new Sprite("res/guy.png", 32, 32); //40, 8);
-	}
 	
 	public Enemy( float x, float y) {
-		super(sprite, x, y, 0f);
+		super(x, y, 0f);
 		this.radius = 32;
 
 	}
@@ -68,14 +62,17 @@ public class Enemy extends Entity implements Updateable, Collideable {
 	private void checkDead() {
 		GameRoom groom = (GameRoom)room;
 		if (hp <= 0) {
-			groom.removeEnemy(this);
+			//groom.removeEnemy(this);
+			setHp(100);
+			setX(0);
+			setY(0);
 		}
 	}
 	private void checkAttack() {
 		GameRoom groom = (GameRoom)room;
 		Character player = groom.collidePlayer(this);
 		if (player != null) {
-			groom.gameOver();
+			//groom.gameOver();
 			
 		}
 	}

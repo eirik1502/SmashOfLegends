@@ -5,9 +5,15 @@ import org.json.simple.parser.JSONParser;
 
 import game.Game;
 import gameObjects.Enemy;
+import graphics.GraphicsEntity;
 import graphics.GraphicsHandeler;
 import graphics.GraphicsUtils;
 import graphics.Sprite;
+import network.ClientGameObjects.ClientBulletEntity;
+import network.ClientGameObjects.ClientCharacterEntity;
+import network.ClientGameObjects.ClientEntity;
+import physics.Collideable;
+import physics.PhysicsHandeler;
 import rooms.Entity;
 import rooms.Text;
 import userInput.InputHandeler;
@@ -19,13 +25,16 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import java.io.*;
 import java.net.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
  
 public class Client {
 
 	
-	public static final Host serverHost = new Host("192.168.38.102", Server.PORT_NUMBER, -1);//"192.168.38.101", Server.PORT_NUMBER);
+	public static final Host serverHost = new Host("192.168.38.102", Server.PORT_NUMBER, -1);//"192.168.38.103", Server.PORT_NUMBER);
 	
 	public static String logFilepath = "src/network/clientLog.txt";
 	
@@ -41,7 +50,12 @@ public class Client {
 
 	//private GraphicsHandeler graphicsHandeler;
     //private long window;
-    private Entity unit;
+    private ClientCharacterEntity[] characters = new ClientCharacterEntity[2];
+    private ArrayList<ClientBulletEntity> bullets = new ArrayList<>();
+    private ArrayList<ClientEntity> entities = new ArrayList<>();
+	private LinkedList<ClientEntity> addEntityBuffer = new LinkedList<>();
+	private LinkedList<ClientEntity> removeEntityBuffer = new LinkedList<>();
+	protected boolean updatingEntities = false;
     
     private float inputStateSendInterval = 60.0f;
     
@@ -51,6 +65,12 @@ public class Client {
     private InputHandeler inputHandeler;
     private GraphicsHandeler graphicsHandeler;
     
+   
+    public static void main(String[] args) throws IOException {
+        Client client = new Client();
+        client.start();
+    }
+   
     
     
     public void start(){
@@ -116,12 +136,86 @@ public class Client {
 		graphicsHandeler = new GraphicsHandeler(window, Game.WIDTH, Game.HEIGHT);
 		inputHandeler = new InputHandeler(window);
  
-    	Sprite sprite = new Sprite("res/frank_original_rifle.png", 32, 32);
-    	unit = new Unit(sprite, 300, 300);
+		ClientCharacterEntity.loadSprite();
+		ClientBulletEntity.loadSprite();
+    	characters[0] = new ClientCharacterEntity(100, 100, 0);
+    	characters[1] = new ClientCharacterEntity(100, 100, 0);
+    	addEntity(characters[0]);
+    	addEntity(characters[1]);
     	
     	//graphicsHandeler.addRenderable(unit);
 
     }
+    
+    private void update() {
+    	glfwPollEvents(); //to allow input on networkOutputThread
+    	
+    	updatingEntities = true;
+    	entities.forEach(b -> b.update());
+    	updatingEntities = false;
+		while(!addEntityBuffer.isEmpty()) {
+			addEntity(addEntityBuffer.poll());
+		}
+		while(!removeEntityBuffer.isEmpty()) {
+			removeEntity(removeEntityBuffer.poll());
+		}
+        
+    	ObjectsState objectsState = networkInput.getNextObjectsState();
+    	CharacterState player1State = objectsState.getPlayer1State();
+    	CharacterState player2State = objectsState.getPlayer2State();
+    
+    	characters[0].setCharacterState(player1State);
+    	characters[1].setCharacterState(player2State);
+
+    	for (CharacterState b : objectsState.getBulletsCreatedState()) {
+    		ClientBulletEntity bullet = new ClientBulletEntity(this, b, b.getSpeed());
+    		addBullet(bullet);
+    		System.out.println("Bullet created: "+bullet);
+    	}
+    }
+    
+    
+    private void render() {
+    	graphicsHandeler.render( new ArrayList<GraphicsEntity>(entities) );
+    }
+    
+    
+    public ClientCharacterEntity collideCharacter(Collideable c) {
+		for (ClientCharacterEntity character : characters) {
+			if (PhysicsHandeler.isCollision(c, character)) {
+				return character;
+			}
+		}
+		return null;
+    }
+    
+    public void removeBullet(ClientBulletEntity bullet) {
+    	removeEntity(bullet);
+    }
+    public void addBullet(ClientBulletEntity bullet) {
+    	addEntity(bullet);
+    }
+    
+	private void addEntity(ClientEntity e) {
+		if (updatingEntities) { //not added at all
+			addEntityBuffer.add(e);
+			return;
+		}
+		else {
+			entities.add(e);
+//			e.roomInit(this);
+//			e.start();
+		}
+	}
+	private void removeEntity(ClientEntity e) {
+		if (updatingEntities) { //not added at all
+			removeEntityBuffer.add(e);
+			return;
+		}
+		else {
+			entities.remove(e);
+		}
+	}
     
     private void loop() {
     	long lastTime = System.nanoTime();
@@ -157,24 +251,6 @@ public class Client {
     }
     
     
-    
-    private void update() {
-    	glfwPollEvents(); //to allow input on networkOutputThread
-        
-    	ObjectsState objectsState = networkInput.getNextObjectsState();
-    	CharacterState player1State = objectsState.getPlayer1State();
-    	
-    	unit.setX(player1State.getX());
-    	unit.setY(player1State.getY());
-    	unit.setRotation(player1State.getDirection());
-    }
-    
-    private void render() {
-    	Entity[] e = {unit};
-    	graphicsHandeler.render(e, new Text[0]);
-    }
-    
-    
     private boolean connectToServer(Host serverHost, DatagramSocket receiveSocket, DatagramSocket sendSocket) {
     	try {
 	    	byte messageType = 0;
@@ -186,13 +262,17 @@ public class Client {
 	    	
 	    	DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getReceivePort());
 			sendSocket.send(datagram);
+			Host dummyHost = new Host("192.168.38.103", 1000, 1000);
+			DatagramPacket dummyDatagram = new DatagramPacket(new byte[0], 0, dummyHost.getAddress(), dummyHost.getReceivePort());
+			receiveSocket.send(dummyDatagram); //
 			System.out.println("Join request sendt");
 			
 			bytes = new byte[Server.SEND_JOIN_RESPONSE_BYTE_SIZE];
 			datagram = new DatagramPacket(bytes, bytes.length);
 			
-			receiveSocket.setSoTimeout(1000); //wait for 1 second
-			receiveSocket.receive(datagram);
+			
+			sendSocket.setSoTimeout(1000); //wait for 1 second
+			sendSocket.receive(datagram);
 			
 			if (bytes[0] != 0) throw new IllegalStateException("Got game data before connection was established");
 			if (bytes[1] == 0) throw new IllegalStateException("Could not connect to server, server is full");
@@ -220,9 +300,4 @@ public class Client {
     }
     
 
-
-    public static void main(String[] args) throws IOException {
-        Client client = new Client();
-        client.start();
-    }
 }

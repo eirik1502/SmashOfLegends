@@ -19,6 +19,9 @@ public class ObjectsState {
 		this.bulletsCreatedState = bulletsCreatedState;
 	}
 
+	public void clearBullets() {
+		bulletsCreatedState.clear();
+	}
 
 	public CharacterState getPlayer1State() {
 		return player1State;

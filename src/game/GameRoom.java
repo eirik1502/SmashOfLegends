@@ -1,5 +1,6 @@
 package game;
 
+import rooms.RelevantInputState;
 import rooms.Room;
 import rooms.Text;
 //import trash.GrCircle;
@@ -7,6 +8,7 @@ import rooms.Text;
 //import trash.ShapeRenderer;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import gameObjects.Board;
 import gameObjects.Bullet;
@@ -21,7 +23,10 @@ import physics.PhysicsHandeler;
 public class GameRoom extends Room {
 	
 	
-	private Character player;
+	private LinkedList<Bullet> createdBullets = new LinkedList<>();
+	
+	
+	private Character player1, player2;
 	private ArrayList<Enemy> enemies = new ArrayList<>();
 	private Board board;
 	
@@ -34,12 +39,16 @@ public class GameRoom extends Room {
 	
 	private boolean active = true;
 	
+	public RelevantInputState player1InputState, player2InputState;
+
+	
 	@Override
 	public void load() {
 //		Bullet.loadSprite();
 //		Enemy.loadSprite();
 //		Wall.loadSprite();
-		player = new Character(300f, 300f);
+		player1 = new Character(300f, 300f);
+		player2 = new Character(1200f, 300f);
 		//board = new Board();
 		
 		//text = new Text("Heello world!", Font.getStandardFont(), 18, 200, 70, 0);
@@ -49,7 +58,9 @@ public class GameRoom extends Room {
 	
 	@Override
 	public void start() {
-		super.addEntity(player);
+		super.addEntity(player1);
+		super.addEntity(player2);
+		//genEnemy();
 //		super.addEntity(board);
 //		super.addText(text);
 //		super.addEntity(board);
@@ -59,14 +70,14 @@ public class GameRoom extends Room {
 
 	@Override
 	public void stop() {
-		super.removeEntity(player);
+		//super.removeEntity(player);
 //		super.removeEntity(rect1);
 //		super.removeEntity(circ1);
 	}
 
 	@Override
 	public void unload() {
-		player = null;
+		//player = null;
 		
 	}
 	
@@ -81,7 +92,33 @@ public class GameRoom extends Room {
 //			genEnemyTimer = this.genEnemyInterval;
 //		}
 //		text.setString("Wave: " + enemyWave);
+		player1.update(this.player1InputState);
+		player2.update(this.player2InputState);
 		super.update();
+	}
+	
+	
+	public void setRelevantInputState(RelevantInputState[] inputStates) {
+		player1InputState = inputStates[0];
+		player2InputState = inputStates[1];
+	}
+	
+	
+	public Bullet[] pollCreatedBullets() {
+		Bullet[] bullets = new Bullet[createdBullets.size()];
+		int i = 0;
+		while (!createdBullets.isEmpty()) {
+			bullets[i++] = createdBullets.poll();
+		}
+		return bullets;
+	}
+	
+	public void addBullet(Bullet bullet) {
+		createdBullets.add(bullet);
+		addEntity(bullet);
+	}
+	public void removeBullet(Bullet bullet) {
+		removeEntity(bullet);
 	}
 	
 	private void genEnemy() {
@@ -94,9 +131,9 @@ public class GameRoom extends Room {
 		addEntity(newEnemy);
 	}
 	
-	public Character getPlayer() {
-		return player;
-	}
+//	public Character getPlayer() {
+//		return player;
+//	}
 	public ArrayList<Enemy> getEnemies() {
 		return enemies;
 	}
@@ -108,9 +145,12 @@ public class GameRoom extends Room {
 //		removeEntity(player);
 //		
 //	}
-	public Character collidePlayer(Collideable c) {
-		if (PhysicsHandeler.isCollision(player, c)) {
-			return player;
+	public Character collideCharacter(Collideable c) {
+		if (PhysicsHandeler.isCollision(player1, c)) {
+			return player1;
+		}
+		if (PhysicsHandeler.isCollision(player2, c)) {
+			return player2;
 		}
 		return null;
 	}
@@ -126,14 +166,14 @@ public class GameRoom extends Room {
 		return board.collideGrid(c);
 	}
 	
-	public void gameOver() {
-		enemies.forEach(e -> removeEntity(e));
-		enemies.clear();
-		
-		Text t = new Text("You lost! reached wave: " + Integer.toString(this.enemyWave), Font.getStandardFont(), 18, player.getX(), player.getY(), 0f);
-		addText(t);
-		removeEntity(player);
-		active = false;
-	}
+//	public void gameOver() {
+//		enemies.forEach(e -> removeEntity(e));
+//		enemies.clear();
+//		
+//		Text t = new Text("You lost! reached wave: " + Integer.toString(this.enemyWave), Font.getStandardFont(), 18, player.getX(), player.getY(), 0f);
+//		addText(t);
+//		removeEntity(player);
+//		active = false;
+//	}
 
 }

@@ -42,9 +42,9 @@ public class Game {
 	
 	private PhysicsHandeler physicsHandeler;
 	
-	private RoomHandeler roomHandeler;
+	//private RoomHandeler roomHandeler;
 	
-	//private long window;
+	private GameRoom gameRoom;
 
 	
 	
@@ -60,14 +60,15 @@ public class Game {
 		
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
 
-		roomHandeler = new RoomHandeler( );
-		ArrayList<Room> rooms = new ArrayList<>();
-		rooms.add(new GameRoom());
+		//roomHandeler = new RoomHandeler( );
+		//ArrayList<Room> rooms = new ArrayList<>();
+		//rooms.add(new GameRoom());
 //		rooms.add(new IntroRoom());
 //		rooms.add(new MenuRoom());
 		//rooms.add(new GameRoom());
-		roomHandeler.setRooms(rooms);
-
+		//roomHandeler.setRooms(rooms);
+		gameRoom = new GameRoom();
+		gameRoom.load();
 		
 		
 	}
@@ -75,7 +76,7 @@ public class Game {
 
 	public void start() {
 
-		roomHandeler.start();
+		gameRoom.start();
 		
 //		long lastTime = System.nanoTime();
 //		double delta = 0.0;
@@ -117,15 +118,24 @@ public class Game {
 	}
 
 	
-	public void update(ClientInput input) {
+	public void update(ClientInput[] input) {
 		//glfwPollEvents();
-		RelevantInputState convertedInput = new RelevantInputState(
-				input.mouseX, input.mouseY, input.mvUp, input.mvDown, input.mvLeft, input.mvRight, input.ac1, input.ac2);
-		roomHandeler.update(convertedInput);
+		RelevantInputState[] inputStates = new RelevantInputState[input.length];
+		for (int i = 0; i < input.length; i++) {
+			ClientInput in = input[i];
+			inputStates[i] =  new RelevantInputState(
+					in.mouseX, in.mouseY, in.mvUp, in.mvDown, in.mvLeft, in.mvRight, in.ac1, in.ac2);
+		}
+		gameRoom.setRelevantInputState(inputStates);
+		gameRoom.update();
 	}
 
 	public Entity[] getEntities() {
-		return roomHandeler.getEntities();
+		return gameRoom.getEntities();
+	}
+	
+	public Bullet[] pollCreatedBullets() {
+		return gameRoom.pollCreatedBullets();
 	}
 //	public void render() {
 //		Entity[] entities = roomHandeler.getEntities();

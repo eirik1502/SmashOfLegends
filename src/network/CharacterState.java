@@ -27,5 +27,7 @@ public class CharacterState {
 		return speed;
 	}
 	
-	
+	public String toString() {
+		return "[CharacterState, x: "+getX()+" y: "+getY()+" dir: "+getDirection()+" speed: "+getSpeed()+"]";
+	}
 }

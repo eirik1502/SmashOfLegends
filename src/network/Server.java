@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 import org.json.simple.JSONObject;
 
 import game.Game;
+import gameObjects.Bullet;
 import rooms.Entity;
 
 public class Server{
@@ -129,58 +130,78 @@ public class Server{
     
     
     private void update() { //----- send packets
-    	if (connectedClients[0] != null)
-    	{
-    		
-    		System.out.println("Input client 1 buffer size:" + client1InputBuffer.size());
-    		if (!client1InputBuffer.isEmpty()) {
-    		}
-    		else {
-    			
-    		}
-    		
-    		while (!client1InputBuffer.isEmpty()) {
-	    		lastInput = client1InputBuffer.poll();
-	    		//System.out.println("Packet handeled: " + currentInput);
-	    	}
-    		game.update(lastInput);
-//	    	else {
-//	    		System.out.println("Packet loss!!!!!!!!!!!!!!!!!!!!!!!!!");
-//	    	}
-	    	
-	    	
-	    	
-	    	if (this.sendStateCounter++ == 2) { //updates 20 times a second
-	    		Entity[] entities = game.getEntities();
-	    		Entity e = entities[0];
-	    		try {
-	    			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(Server.RECIEVE_MSG_BYTE_SIZE);
-	            	DataOutputStream out = new DataOutputStream( byteStream );
-	            	out.writeByte(1); //type
-	            	out.writeFloat(e.getX());
-	            	out.writeFloat(e.getY());
-	            	out.writeFloat(e.getRotation());
-	            	out.writeFloat(0);
-	            	out.writeFloat(0);
-	            	out.writeFloat(0);
-	            	out.writeFloat(0);
-	            	out.writeFloat(0);
-	            	out.writeByte(0); //no bullets
-		    		byte[] bytes = byteStream.toByteArray();
-		    		
-		    		Host reciever = this.connectedClients[0];
-		    		
-		    		DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, reciever.getAddress(), reciever.getReceivePort());
+    	ClientInput[] clientsInput = {new ClientInput(), new ClientInput()};
+    	for (int i = 0; i < connectedClients.length; i++) {
+	    	if (connectedClients[i] != null)
+	    	{
+	    		ConcurrentLinkedDeque<ClientInput> clientInputBuffer = (i == 0)? client1InputBuffer:client2InputBuffer;
+	    		//System.out.println("Input client 1 buffer size:" + client1InputBuffer.size());
+	    		if (!clientInputBuffer.isEmpty()) {
+	    		}
+	    		else {
+	    			
+	    		}
 	    		
-					sendSocket.send(datagram);
-				}
-	    		catch (IOException e1) {
-					e1.printStackTrace();
-				}
+	    		while (!clientInputBuffer.isEmpty()) {
+		    		lastInput = clientInputBuffer.poll();
+		    		//System.out.println("Packet handeled: " + currentInput);
+		    	}
+	    		clientsInput[i] = lastInput;
 	    		
-	    		messagesSendt++;
-	    		sendStateCounter = 0;
+	//	    	else {
+	//	    		System.out.println("Packet loss!!!!!!!!!!!!!!!!!!!!!!!!!");
+	//	    	}
 	    	}
+    	}
+	    	
+	    game.update(clientsInput);
+	    	
+    	if (this.sendStateCounter++ == 2) { //updates 20 times a second
+	    			
+    		Entity[] entities = game.getEntities();
+    		Bullet[] createdBullets = game.pollCreatedBullets();
+    		//the two players will be the first two elements
+    		Entity a = entities[0]; //player
+    		Entity b = entities[1]; //enemy
+    		try {
+    			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(Server.RECIEVE_MSG_BYTE_SIZE);
+            	DataOutputStream out = new DataOutputStream( byteStream );
+            	out.writeByte(1); //type
+            	out.writeFloat(a.getX());
+            	out.writeFloat(a.getY());
+            	out.writeFloat(a.getRotation());
+            	out.writeFloat(0);
+            	out.writeFloat(b.getX());
+            	out.writeFloat(b.getY());
+            	out.writeFloat(b.getRotation());
+            	out.writeFloat(0);
+            	out.writeByte(createdBullets.length); //number of bullets
+            	for (Bullet bu : createdBullets) {
+            		out.writeFloat(bu.getX());
+            		out.writeFloat(bu.getY());
+            		out.writeFloat(bu.getRotation());
+            		out.writeFloat(bu.getSpeed());
+            		System.out.println("-------------------------------"+bu);
+            	}
+            	
+	    		byte[] bytes = byteStream.toByteArray();
+	    		
+		    	for (int i = 0; i < connectedClients.length; i++) {
+		    		if (connectedClients[i] != null) {
+		    			Host reciever = this.connectedClients[i];
+			    		DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, reciever.getAddress(), reciever.getReceivePort());
+						sendSocket.send(datagram);
+			    	}
+		    	}
+	    		
+			}
+    		catch (IOException e1) {
+				e1.printStackTrace();
+			}
+	    	
+	    		
+    		messagesSendt++;
+    		sendStateCounter = 0;
     	}
     	
     	
@@ -343,8 +364,10 @@ public class Server{
         }
         
         private void socketSend( byte[] data, Host client) {
+        	System.out.println(client.getAddress());
+        	System.out.println(client.getReceivePort());
         	try {
-        		DatagramPacket packet = new DatagramPacket( data, data.length, client.getAddress(), client.getReceivePort() );
+        		DatagramPacket packet = new DatagramPacket( data, data.length, client.getAddress(), client.getSendPort() );
 				socket.send(packet);
 				
 			} catch (IOException e) {

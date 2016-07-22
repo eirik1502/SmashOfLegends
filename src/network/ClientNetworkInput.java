@@ -100,6 +100,7 @@ class ClientNetworkInput implements Runnable {
     public ObjectsState getNextObjectsState() {
     	if (objectsStateQueue.isEmpty()) {
     		log.println("objectStateQueue is empty, returning last state");
+    		lastObjectsState.clearBullets();
     		return this.lastObjectsState;
     	}
     	ObjectsState nextState = this.objectsStateQueue.poll();

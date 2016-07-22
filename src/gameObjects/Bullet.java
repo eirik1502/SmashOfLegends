@@ -21,14 +21,10 @@ public class Bullet extends Entity implements Updateable, Collideable{
 	
 	private int timer = 60;
 	
-	private static Sprite sprite;
-	
-	public static void loadSprite() {
-		sprite = new Sprite("res/bullet_cyber.png", 40, 8); //40, 8);
-	}
+
 
 	public Bullet(float startX, float startY, float direction, float speed) {
-		super(sprite, startX, startY, direction);
+		super(startX, startY, direction);
 		this.speed = speed;
 
 	}
@@ -44,10 +40,10 @@ public class Bullet extends Entity implements Updateable, Collideable{
 		x += Math.cos(rotation)*speed;
 		y += Math.sin(rotation)*speed;
 		
-		Enemy enemy = groom.collideEnemy(this);
-		if (enemy != null) {
-			enemy.addHp(-34);
-			groom.removeEntity(this);
+		Character character = groom.collideCharacter(this);
+		if (character != null) {
+			character.addHp(-34);
+			groom.removeBullet(this);
 		}
 
 //		Enemy enemy = game.getEnemy();
@@ -65,5 +61,12 @@ public class Bullet extends Entity implements Updateable, Collideable{
 		return new PhRectangle(x-radius, y-radius, radius*2, radius*2);
 	}
 
+	public float getSpeed() {
+		return speed;
+	}
+	
+	public String toString() {
+		return "[Bullet, x: "+getX()+" y: "+getY()+" dir: "+getRotation()+" speed: "+getSpeed()+"]";
+	}
 
 }

@@ -21,23 +21,27 @@ import game.Game;
 import game.GameRoom;
 
 
-public class Character extends Entity implements Updateable, Collideable {
+public class Character extends Entity implements Collideable {
 
 
 	private float radius;
 
+	private int hp = 100;
 
 	private int shootTimer = 0;
 	private int shootDelay = 40;
 	
 	private Text text;
 	
+	private float startX, startY;
 
 	public Character( float startX, float startY ) {
-		super(null, 200, 100, 0);
+		super(200, 100, 0);
 		//new Sprite("res/frank_3_shotgun_strip13.png", 13, 40, 32, 0)
 		setX(startX);
 		setY(startY);
+		this.startX = startX;
+		this.startY = startY;
 		radius = 32;
 		
 		//text = new Text("", Font.getStandardFont(), 18, getX(), getY()-16, 0f);
@@ -51,12 +55,10 @@ public class Character extends Entity implements Updateable, Collideable {
 	}
 	
 
-	@Override
-	public void update() {
+	public void update(RelevantInputState is) {
 		super.update();
 		
 		GameRoom groom = (GameRoom)room;
-		RelevantInputState is = room.getInputState();
 		
 		float lastX = x;
 		float lastY = y;
@@ -106,22 +108,36 @@ public class Character extends Entity implements Updateable, Collideable {
 		}
 		super.rotation = (float)currRotation;
 
-//		if (shootTimer == 0) {
-//			if (is.isAction1()) {
-//				float bulletSpeed = 15+2*(float)Math.random();
-//				float offset = 96;
-//				Bullet bullet = new Bullet(getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation, bulletSpeed);
-//				sprite.setImageSpeed(1);
-//				room.addEntity( bullet);
-//
-//				shootTimer = shootDelay;
-//			}
-//		}
-//		else {
-//			shootTimer--;
-//		}
+		if (shootTimer == 0) {
+			if (is.isAction1()) {
+				float bulletSpeed = 15+2*(float)Math.random();
+				float offset = 96;
+				Bullet bullet = new Bullet(getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation, bulletSpeed);
+				//sprite.setImageSpeed(1);
+				groom.addBullet( bullet);
+
+				shootTimer = shootDelay;
+			}
+		}
+		else {
+			shootTimer--;
+		}
+		
+		checkDead();
 	}
 
+
+	private void checkDead() {
+		if (hp <= 0) {
+			hp = 100;
+			setX(startX);
+			setY(startY);
+		}
+	}
+	
+	public void addHp(int hp) {
+		this.hp += hp;
+	}
 	
 	@Override
 	public PhShape getPhShape() {
