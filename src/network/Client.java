@@ -271,8 +271,8 @@ public class Client {
 			datagram = new DatagramPacket(bytes, bytes.length);
 			
 			
-			sendSocket.setSoTimeout(1000); //wait for 1 second
-			sendSocket.receive(datagram);
+			receiveSocket.setSoTimeout(1000); //wait for 1 second
+			receiveSocket.receive(datagram);
 			
 			if (bytes[0] != 0) throw new IllegalStateException("Got game data before connection was established");
 			if (bytes[1] == 0) throw new IllegalStateException("Could not connect to server, server is full");

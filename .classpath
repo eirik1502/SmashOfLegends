@@ -4,12 +4,12 @@
 	<classpathentry kind="src" path="shaders"/>
 	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/Eirik/lwjgl/jar/lwjgl.jar" sourcepath="C:/Users/Eirik/lwjgl/src.zip">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Eirik/lwjgl/native"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/json-simple-1.1.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SoL_engine"/>
+	<classpathentry kind="lib" path="/SoL_engine/jar/lwjgl/jar/lwjgl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="SoL_engine/jar/lwjgl/native"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

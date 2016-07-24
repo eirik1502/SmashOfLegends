@@ -2,7 +2,7 @@ package network;
 
 public class ClientInput {
 
-	public final byte msgType;
+	//public final byte msgType;
 	public final float mouseX;
 	public final float mouseY;
 	public final boolean mvUp;
@@ -14,11 +14,11 @@ public class ClientInput {
 	
 	
 	public ClientInput() {
-		this((byte)0, 0f, 0f, false, false, false, false, false, false);
+		this(0f, 0f, false, false, false, false, false, false);
 	}
-	public ClientInput( byte msgType, float mouseX, float mouseY, boolean mvUp,
+	public ClientInput( float mouseX, float mouseY, boolean mvUp,
 						boolean mvDown,	boolean mvLeft,	boolean mvRight, boolean ac1, boolean ac2 ) {
-	this.msgType = msgType;
+	//this.msgType = msgType;
 	this.mouseX = mouseX;
 	this.mouseY = mouseY;
 	this.mvUp = mvUp;
@@ -31,6 +31,6 @@ public class ClientInput {
 	}
 	
 	public String toString() {
-		return "["+"msgType:"+msgType+" mouseX:"+mouseX+" mouseY:"+mouseY +" mvUp:"+mvUp+" mvDown:"+mvDown+" mvLeft:"+mvLeft+" mvRight:"+mvRight +" action1:"+ac1+" action2:"+ac2+ "]";
+		return "["+"mouseX:"+mouseX + " mouseY:"+mouseY +" mvUp:"+mvUp+" mvDown:"+mvDown+" mvLeft:"+mvLeft+" mvRight:"+mvRight +" action1:"+ac1+" action2:"+ac2+ "]";
 	}
 }
