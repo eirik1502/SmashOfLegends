@@ -110,9 +110,18 @@ public class Character extends Entity implements Collideable {
 
 		if (shootTimer == 0) {
 			if (is.isAction1()) {
-				float bulletSpeed = 15+2*(float)Math.random();
+				//float bulletSpeed = 15+2*(float)Math.random();
 				float offset = 96;
-				Bullet bullet = new Bullet(getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation, bulletSpeed);
+				Bullet bullet = new BasicBullet(getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation);
+				//sprite.setImageSpeed(1);
+				groom.addBullet( bullet);
+
+				shootTimer = shootDelay;
+			}
+			else if (is.isAction2()) {
+				//float bulletSpeed = 15+2*(float)Math.random();
+				float offset = 96;
+				Bullet bullet = new SpecialBullet(getX()+lengthdirX(offset, rotation), getY()+lengthdirY(offset, rotation), rotation);
 				//sprite.setImageSpeed(1);
 				groom.addBullet( bullet);
 

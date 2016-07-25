@@ -9,6 +9,7 @@ import graphics.GraphicsEntity;
 import graphics.GraphicsHandeler;
 import graphics.GraphicsUtils;
 import graphics.Sprite;
+import network.ClientGameObjects.ClientBackground;
 import network.ClientGameObjects.ClientBulletEntity;
 import network.ClientGameObjects.ClientCharacterEntity;
 import network.ClientGameObjects.ClientEntity;
@@ -34,9 +35,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class Client {
 
 	
-	public static final Host serverHost = new Host("192.168.38.102", Server.PORT_NUMBER, -1);//"192.168.38.103", Server.PORT_NUMBER);
+	public static final Host serverHost = new Host("192.168.38.102", Server.PORT_NUMBER, -1);//"192.168.38.102", Server.PORT_NUMBER);
 	
 	public static String logFilepath = "src/network/clientLog.txt";
+	
 	
 	private LogWriter log;
 	
@@ -137,9 +139,11 @@ public class Client {
 		inputHandeler = new InputHandeler(window);
  
 		ClientCharacterEntity.loadSprite();
-		ClientBulletEntity.loadSprite();
+		ClientBulletEntity.loadSprites();
     	characters[0] = new ClientCharacterEntity(100, 100, 0);
     	characters[1] = new ClientCharacterEntity(100, 100, 0);
+    	
+    	addEntity(new ClientBackground());
     	addEntity(characters[0]);
     	addEntity(characters[1]);
     	
@@ -167,8 +171,8 @@ public class Client {
     	characters[0].setCharacterState(player1State);
     	characters[1].setCharacterState(player2State);
 
-    	for (CharacterState b : objectsState.getBulletsCreatedState()) {
-    		ClientBulletEntity bullet = new ClientBulletEntity(this, b, b.getSpeed());
+    	for (NetBulletState b : objectsState.getBulletsCreatedState()) {
+    		ClientBulletEntity bullet = ClientBulletEntity.getBulletByNumber(this, b);//new ClientBulletEntity(this, b, b.getSpeed());
     		addBullet(bullet);
     		System.out.println("Bullet created: "+bullet);
     	}

@@ -13,37 +13,60 @@ import rooms.Room;
 import rooms.Updateable;
 import userInput.InputState;
 
-public class Bullet extends Entity implements Updateable, Collideable{
+public abstract class Bullet extends Entity implements Updateable, Collideable{
 
 	
+	//must be overriden
+	
+	
+	private byte typeNumber;
 	private float radius;
-	private float speed = 4;
+	private float damage;
+	private float knockback;
 	
-	private int timer = 60;
+	public GameRoom gameRoom;
+	
+	private float speed;
+	
+	private int timer;
 	
 
 
-	public Bullet(float startX, float startY, float direction, float speed) {
+	public Bullet(byte typeNumber, float radius, float damage, float knockback, float startX, float startY, float direction, float speed, int timer) {
 		super(startX, startY, direction);
+		this.typeNumber = typeNumber;
+		this.radius = radius;
+		this.damage = damage;
+		this.knockback = knockback;
 		this.speed = speed;
-
+		this.timer = timer;
 	}
+	
+	@Override
+	public void start() {
+		gameRoom = (GameRoom)this.room;
+	}
+	
+	public abstract void onPlayerCollision(Character c);
 
+	public void destroy() {
+		gameRoom.removeBullet(this);
+	}
+	public void applyDamage(Character c, int damage) {
+		c.addHp(-damage);
+	}
 
 	@Override
 	public void update() {
-
-		GameRoom groom = (GameRoom)room;
 		
 		if (timer-- == 0) room.removeEntity(this);
 			
 		x += Math.cos(rotation)*speed;
 		y += Math.sin(rotation)*speed;
 		
-		Character character = groom.collideCharacter(this);
+		Character character = gameRoom.collideCharacter(this);
 		if (character != null) {
-			character.addHp(-34);
-			groom.removeBullet(this);
+			
 		}
 
 //		Enemy enemy = game.getEnemy();
@@ -55,10 +78,28 @@ public class Bullet extends Entity implements Updateable, Collideable{
 //			game.removeUnit(this);
 //		}
 	}
+	
 
 	@Override
 	public PhShape getPhShape() {
 		return new PhRectangle(x-radius, y-radius, radius*2, radius*2);
+	}
+
+	
+	public byte getTypeNumber() {
+		return typeNumber;
+	}
+
+	public float getRadius() {
+		return radius;
+	}
+
+	public float getDamage() {
+		return damage;
+	}
+
+	public float getKnockback() {
+		return knockback;
 	}
 
 	public float getSpeed() {

@@ -113,17 +113,13 @@ public class Server{
     
     
     private void update() { //----- send packets
-    	System.out.println("Updating main server thread");
     	ClientInput[] inputs = networkInput.getNextClientsInput();
-    	System.out.println(inputs[0]);
 	    game.update( inputs );
 	    
 	    	
     	if (this.sendStateCounter++ == 1) { //2    updates 20 times a second
-    		System.out.println("send object state-----------------------");
     	    ObjectsState objectsState = convertToObjectsState(game.getEntities(), game.pollCreatedBullets());
     	    networkOutput.sendObjectsState( objectsState );
-    	    System.out.println("objectState sendt --------------------");
     		messagesSendt++;
     		sendStateCounter = 0;
     	}
@@ -136,9 +132,9 @@ public class Server{
 		    		
 		CharacterState player1State = new CharacterState(player1.getX(), player1.getY(), player1.getRotation(), 0f);
 		CharacterState player2State = new CharacterState(player2.getX(), player2.getY(), player2.getRotation(), 0f);
-	    ArrayList<CharacterState> bulletsState = new ArrayList<>();
+	    ArrayList<NetBulletState> bulletsState = new ArrayList<>();
 	    for (Bullet bul : createdBullets) {
-	    	bulletsState.add( new CharacterState(bul.getX(), bul.getY(), bul.getRotation(), bul.getSpeed()) );
+	    	bulletsState.add( new NetBulletState(bul.getTypeNumber(), bul.getX(), bul.getY(), bul.getRotation(), bul.getSpeed()) );
 	    }
     	
     	return new ObjectsState(player1State, player2State, bulletsState);
@@ -150,7 +146,7 @@ public class Server{
      * @return new client number, -1 if server is full
      */
     public synchronized int connectClient(Host client) {
-    	for (int i = 1; i < connectedClients.length; i++) {
+    	for (int i = 0; i < connectedClients.length; i++) {
     		if (!isClientNumberOccupied(i)) {
     			connectedClients[i] = client;
     			return i;
@@ -170,7 +166,7 @@ public class Server{
 //    	for (Host c : connectedClients) {
 //    		if ( c.equals(client)) return true;
 //    	}
-    	System.out.println("check client connected");
+    	//System.out.println("check client connected");
     	if (connectedClients[0] != null && connectedClients[0].equals(client)) return true;
     	if (connectedClients[1] != null && connectedClients[1].equals(client)) return true;
     	return false;
@@ -181,13 +177,12 @@ public class Server{
      */
     public synchronized int getConnectedClientNumber( Host client) {
     	int i = 0;
-    	System.out.println("check client number");
 //    	for (Host c : connectedClients) {
 //    		if (c != null && c.equals(client)) return i;
 //    		i++;
 //    	}
     	if (connectedClients[0] != null && connectedClients[0].equals(client)) return 0;
-    	if (connectedClients[1] != null && connectedClients[1].equals(client)) return 0;
+    	if (connectedClients[1] != null && connectedClients[1].equals(client)) return 1;
     	return -1;
     }
     

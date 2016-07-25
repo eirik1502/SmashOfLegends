@@ -71,8 +71,7 @@ class ServerNetworkInput extends Thread {
             		//System.err.println("client is connected");
             		int clientNumber = server.getConnectedClientNumber(newClient);
             		resetTimeoutTimer(clientNumber);
-            		
-            		if (clientNumber != 0) throw new IllegalStateException("CLient not 0");
+            	
             		//System.out.println("ClientNumber: " + clientNumber);
             		
             		if (msgType == 1) {//ingame data
@@ -131,7 +130,6 @@ class ServerNetworkInput extends Thread {
     //supposed to give last states when called 60 ups
     public synchronized ClientInput getNextClientInput(int clientNumber) {
     	ConcurrentLinkedDeque<ClientInput> inputBuffer = clientsInputBuffer.get(clientNumber);
-    	System.out.println("Buffer size: " + inputBuffer.size());
 //    	if (inputBuffer.isEmpty()) {
 //    		return this.lastClientsInputOnBuffer[clientNumber];
 //    	}

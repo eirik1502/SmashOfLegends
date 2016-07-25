@@ -27,7 +27,7 @@ public class ServerNetworkOutput {
 	public void sendObjectsState(ObjectsState states) {
 		CharacterState p1s = states.getPlayer1State();
 		CharacterState p2s = states.getPlayer2State();
-		ArrayList<CharacterState> createdBulletsState = states.getBulletsCreatedState();
+		ArrayList<NetBulletState> createdBulletsState = states.getBulletsCreatedState();
 		
 		try {
 			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(Server.RECIEVE_MSG_BYTE_SIZE);
@@ -42,14 +42,14 @@ public class ServerNetworkOutput {
         	out.writeFloat(p2s.getDirection());
         	out.writeFloat(p2s.getSpeed()); //always 0
         	out.writeByte(createdBulletsState.size()); //number of bullets
-        	for (CharacterState bu : createdBulletsState) {
+        	for (NetBulletState bu : createdBulletsState) {
+        		out.writeByte(bu.getBulletNumber()); //bullet type
         		out.writeFloat(bu.getX());
         		out.writeFloat(bu.getY());
         		out.writeFloat(bu.getDirection());
         		out.writeFloat(bu.getSpeed());
         		//System.out.println("-------------------------------"+bu);
         	}
-        	
     		byte[] bytes = byteStream.toByteArray();
     		
 	    	for (int i = 0; i < Server.TOTAL_CLIENT_COUNT; i++) {

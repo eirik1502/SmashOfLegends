@@ -44,7 +44,6 @@ class ClientNetworkInput implements Runnable {
             	byte msgType = in.readByte();
             	
             	//Host newClient = new Host(datagramPacket);
-            	
             	switch(msgType) {
             		
             	case 1: //game data
@@ -63,14 +62,15 @@ class ClientNetworkInput implements Runnable {
                 	CharacterState player1State = new CharacterState(p1X, p1Y, p1Direction, p1Speed);
                 	CharacterState player2State = new CharacterState(p2X, p2Y, p2Direction, p2Speed);
                 	
-                	ArrayList<CharacterState> bulletsState = new ArrayList<>();
+                	ArrayList<NetBulletState> bulletsState = new ArrayList<>();
                 	for (int i = 0; i < bulletsCreatedCount; i++) {
+                		byte bulletType = in.readByte();
                 		float bX = in.readFloat();
                     	float bY = in.readFloat();
                     	float bDirection = in.readFloat();
                     	float bSpeed = in.readFloat();
                     	
-                    	CharacterState bulletState = new CharacterState(bX, bY, bDirection, bSpeed);
+                    	NetBulletState bulletState = new NetBulletState(bulletType, bX, bY, bDirection, bSpeed);
                     	bulletsState.add(bulletState);
                 	}
                 	
