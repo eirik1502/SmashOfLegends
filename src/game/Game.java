@@ -130,6 +130,10 @@ public class Game {
 		gameRoom.update();
 	}
 
+	
+	public Camera[] getCameras() {
+		return gameRoom.getCameras();
+	}
 	public Entity[] getEntities() {
 		return gameRoom.getEntities();
 	}

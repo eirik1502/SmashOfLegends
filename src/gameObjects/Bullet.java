@@ -66,7 +66,7 @@ public abstract class Bullet extends Entity implements Updateable, Collideable{
 		
 		Character character = gameRoom.collideCharacter(this);
 		if (character != null) {
-			
+			onPlayerCollision(character);
 		}
 
 //		Enemy enemy = game.getEnemy();

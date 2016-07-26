@@ -19,8 +19,8 @@ class ClientNetworkInput implements Runnable {
     private LogWriter log;
     
     
-    private ConcurrentLinkedDeque<ObjectsState> objectsStateQueue = new ConcurrentLinkedDeque<>();
-    private ObjectsState lastObjectsState = new ObjectsState();
+    private ConcurrentLinkedDeque<ClientObjectsState> objectsStateQueue = new ConcurrentLinkedDeque<>();
+    private ClientObjectsState lastObjectsState = new ClientObjectsState();
 
     
     public ClientNetworkInput(DatagramSocket socket, LogWriter log) {
@@ -49,7 +49,8 @@ class ClientNetworkInput implements Runnable {
             	case 1: //game data
             		//log.println("..game data");
 
-            		
+            		float camX = in.readFloat();
+            		float camY = in.readFloat();
             		float p1X = in.readFloat();
                 	float p1Y = in.readFloat();
                 	float p1Direction = in.readFloat();
@@ -59,6 +60,7 @@ class ClientNetworkInput implements Runnable {
                 	float p2Direction = in.readFloat();
                 	float p2Speed = in.readFloat();
                 	byte bulletsCreatedCount = in.readByte();
+                	NetCameraState cameraState = new NetCameraState(camX, camY);
                 	CharacterState player1State = new CharacterState(p1X, p1Y, p1Direction, p1Speed);
                 	CharacterState player2State = new CharacterState(p2X, p2Y, p2Direction, p2Speed);
                 	
@@ -74,7 +76,9 @@ class ClientNetworkInput implements Runnable {
                     	bulletsState.add(bulletState);
                 	}
                 	
-                	ObjectsState objectsState = new ObjectsState(player1State, player2State, bulletsState);
+                	ClientObjectsState objectsState = new ClientObjectsState(cameraState, player1State, player2State, bulletsState);
+                	System.out.println(objectsState);
+                	
                 	this.addObjectsState(objectsState);
                 	
             		break;
@@ -93,17 +97,17 @@ class ClientNetworkInput implements Runnable {
         }
     }
     
-    private void addObjectsState(ObjectsState objectsState) {
+    private void addObjectsState(ClientObjectsState objectsState) {
     	this.objectsStateQueue.add(objectsState);
     }
     
-    public ObjectsState getNextObjectsState() {
+    public ClientObjectsState getNextObjectsState() {
     	if (objectsStateQueue.isEmpty()) {
     		log.println("objectStateQueue is empty, returning last state");
     		lastObjectsState.clearBullets();
     		return this.lastObjectsState;
     	}
-    	ObjectsState nextState = this.objectsStateQueue.poll();
+    	ClientObjectsState nextState = this.objectsStateQueue.poll();
     	lastObjectsState = nextState;
     	//log.println("Returning next objectsState: " + nextState);
     	return nextState;

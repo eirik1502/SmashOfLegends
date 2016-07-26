@@ -11,6 +11,7 @@ import org.json.simple.JSONObject;
 
 import game.Game;
 import gameObjects.Bullet;
+import graphics.Camera;
 import rooms.Entity;
 
 public class Server{
@@ -20,7 +21,7 @@ public class Server{
     //private static int PORT_NUMBER_SEND = 7771;
     public static int RECIEVE_MSG_BYTE_SIZE = 15;
     public static int SEND_JOIN_RESPONSE_BYTE_SIZE = 2;
-    public static int SEND_GAME_DATA_BYTE_SIZE_MAX = 1+16*2+16*4;
+    public static int SEND_GAME_DATA_BYTE_SIZE_MAX = 1+8+16*2+16*4; //msgType+cameraPos+playersPos+possibly4Bullets
     
     public static int TOTAL_CLIENT_COUNT = 2;
     public static int INACTIVE_TIMEOUT_TIME = 1000*5;
@@ -53,8 +54,6 @@ public class Server{
     	game = new Game();
     	game.init();
     	game.start();
-    	
-
     	
     	
         try {
@@ -118,18 +117,24 @@ public class Server{
 	    
 	    	
     	if (this.sendStateCounter++ == 1) { //2    updates 20 times a second
-    	    ObjectsState objectsState = convertToObjectsState(game.getEntities(), game.pollCreatedBullets());
-    	    networkOutput.sendObjectsState( objectsState );
+    	    ServerObjectsState objectsState = convertToObjectsState(game.getCameras(), game.getEntities(), game.pollCreatedBullets());
+    	    networkOutput.sendObjectsState(objectsState );
     		messagesSendt++;
     		sendStateCounter = 0;
     	}
     	
     }
     
-    private ObjectsState convertToObjectsState(Entity[] entities, Bullet[] createdBullets) {
+
+    private ServerObjectsState convertToObjectsState(Camera[] cameras, Entity[] entities, Bullet[] createdBullets) {
+    	
     	Entity player1 = entities[0];
 		Entity player2 = entities[1];
-		    		
+    	Camera camera1 = cameras[0];
+    	Camera camera2 = cameras[1];
+    	
+		NetCameraState camera1State = new NetCameraState(camera1.getX(), camera1.getY());
+		NetCameraState camera2State = new NetCameraState(camera2.getX(), camera2.getY());
 		CharacterState player1State = new CharacterState(player1.getX(), player1.getY(), player1.getRotation(), 0f);
 		CharacterState player2State = new CharacterState(player2.getX(), player2.getY(), player2.getRotation(), 0f);
 	    ArrayList<NetBulletState> bulletsState = new ArrayList<>();
@@ -137,7 +142,7 @@ public class Server{
 	    	bulletsState.add( new NetBulletState(bul.getTypeNumber(), bul.getX(), bul.getY(), bul.getRotation(), bul.getSpeed()) );
 	    }
     	
-    	return new ObjectsState(player1State, player2State, bulletsState);
+    	return new ServerObjectsState(camera1State, camera2State, player1State, player2State, bulletsState);
     }
     
     /**

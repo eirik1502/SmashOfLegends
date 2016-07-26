@@ -24,38 +24,52 @@ public class ServerNetworkOutput {
 	}
 	
 	
-	public void sendObjectsState(ObjectsState states) {
+	public void sendObjectsState(ServerObjectsState states) {
+		NetCameraState[] camerasState = {states.getCamera1State(), states.getCamera2State() };
 		CharacterState p1s = states.getPlayer1State();
 		CharacterState p2s = states.getPlayer2State();
 		ArrayList<NetBulletState> createdBulletsState = states.getBulletsCreatedState();
 		
 		try {
-			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(Server.RECIEVE_MSG_BYTE_SIZE);
-        	DataOutputStream out = new DataOutputStream( byteStream );
-        	out.writeByte(1); //type
-        	out.writeFloat(p1s.getX());
-        	out.writeFloat(p1s.getY());
-        	out.writeFloat(p1s.getDirection());
-        	out.writeFloat(p1s.getSpeed()); //always 0
-        	out.writeFloat(p2s.getX());
-        	out.writeFloat(p2s.getY());
-        	out.writeFloat(p2s.getDirection());
-        	out.writeFloat(p2s.getSpeed()); //always 0
-        	out.writeByte(createdBulletsState.size()); //number of bullets
+			ByteArrayOutputStream postByteStream = new ByteArrayOutputStream(Server.SEND_GAME_DATA_BYTE_SIZE_MAX-9);
+			ByteArrayOutputStream preByteStream = new ByteArrayOutputStream(9);
+        	DataOutputStream postOut = new DataOutputStream( postByteStream );
+        	DataOutputStream preOut = new DataOutputStream( preByteStream );
+        	
+        	//postOut, general for both clients, preOut special for the clients + mesg type
+        	//preOut.writeByte(1); //type
+        	postOut.writeFloat(p1s.getX());
+        	postOut.writeFloat(p1s.getY());
+        	postOut.writeFloat(p1s.getDirection());
+        	postOut.writeFloat(p1s.getSpeed()); //always 0
+        	postOut.writeFloat(p2s.getX());
+        	postOut.writeFloat(p2s.getY());
+        	postOut.writeFloat(p2s.getDirection());
+        	postOut.writeFloat(p2s.getSpeed()); //always 0
+        	postOut.writeByte(createdBulletsState.size()); //number of bullets
         	for (NetBulletState bu : createdBulletsState) {
-        		out.writeByte(bu.getBulletNumber()); //bullet type
-        		out.writeFloat(bu.getX());
-        		out.writeFloat(bu.getY());
-        		out.writeFloat(bu.getDirection());
-        		out.writeFloat(bu.getSpeed());
+        		postOut.writeByte(bu.getBulletNumber()); //bullet type
+        		postOut.writeFloat(bu.getX());
+        		postOut.writeFloat(bu.getY());
+        		postOut.writeFloat(bu.getDirection());
+        		postOut.writeFloat(bu.getSpeed());
         		//System.out.println("-------------------------------"+bu);
         	}
-    		byte[] bytes = byteStream.toByteArray();
+        	
     		
 	    	for (int i = 0; i < Server.TOTAL_CLIENT_COUNT; i++) {
+	    		preOut.writeByte(1); //msgType
+	    		preOut.writeFloat(camerasState[i].getX());
+	    		preOut.writeFloat(camerasState[i].getY());
+	    		preOut.write( postByteStream.toByteArray() );
+	    		byte[] bytes = preByteStream.toByteArray();
+	    		//System.out.println(bytes[0]);
+	    		
 	    		if (server.isClientNumberOccupied(i)) {
 	    			socketSend(bytes, i);
 	    		}
+	    		
+	    		preByteStream.reset();
 	    	}
     		
 		}

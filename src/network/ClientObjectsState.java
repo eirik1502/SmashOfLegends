@@ -1,21 +1,25 @@
 package network;
 
+
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 
-public class ObjectsState {
+public class ClientObjectsState {
 
+	
+	private NetCameraState cameraState;
+	
 	private CharacterState player1State, player2State;
 	
 	
 	private ArrayList<NetBulletState> bulletsCreatedState;
 	
 	
-	public ObjectsState() {
-		this(new CharacterState(), new CharacterState(), new ArrayList<NetBulletState>());
+	public ClientObjectsState() {
+		this(new NetCameraState(), new CharacterState(), new CharacterState(), new ArrayList<NetBulletState>());
 	}
-	public ObjectsState( CharacterState player1State, CharacterState player2State, ArrayList<NetBulletState> bulletsCreatedState) {
-
+	public ClientObjectsState( NetCameraState cameraState, CharacterState player1State, CharacterState player2State, ArrayList<NetBulletState> bulletsCreatedState) {
+		this.cameraState = cameraState;
 		this.player1State = player1State;
 		this.player2State = player2State;
 		this.bulletsCreatedState = bulletsCreatedState;
@@ -26,6 +30,9 @@ public class ObjectsState {
 	}
 	
 	
+	public NetCameraState getCameraState() {
+		return this.cameraState;
+	}
 	public CharacterState getPlayer1State() {
 		return player1State;
 	}
@@ -36,5 +43,8 @@ public class ObjectsState {
 		return bulletsCreatedState;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "["+cameraState+player1State+player2State+bulletsCreatedState+"]";
+	}
 }

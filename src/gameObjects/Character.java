@@ -1,7 +1,9 @@
 package gameObjects;
 
+import graphics.Camera;
 import graphics.Font;
 import graphics.Sprite;
+import maths.TrigUtils;
 import physics.Collideable;
 import physics.PhRectangle;
 import physics.PhShape;
@@ -33,6 +35,8 @@ public class Character extends Entity implements Collideable {
 	
 	private Text text;
 	
+	private Camera camera;
+	
 	private float startX, startY;
 
 	public Character( float startX, float startY ) {
@@ -48,6 +52,10 @@ public class Character extends Entity implements Collideable {
 		
 		//super.getSprite().setImageSpeed(0);
 		//getSprite().setOnAnimationEnd(sprite->{sprite.setImageSpeed(0);});
+	}
+	
+	public void setCamera(Camera camera) {
+		this.camera = camera;
 	}
 	
 	@Override
@@ -98,15 +106,18 @@ public class Character extends Entity implements Collideable {
 //		text.setY(y-64);
 
 
-		double deltaY = is.getMouseY() - getY();
-		double deltaX = is.getMouseX() - getX();
-		double currRotation;
-		if (deltaX == 0) currRotation = deltaY > 0? Math.PI/2 : 1.5*Math.PI;
-		else {
-			currRotation = Math.atan( deltaY/deltaX);
-			if (deltaX < 0) currRotation += Math.PI;
-		}
-		super.rotation = (float)currRotation;
+//		double deltaY = is.getMouseY() - getY();
+//		double deltaX = is.getMouseX() - getX();
+//		double currRotation;
+//		if (deltaX == 0) currRotation = deltaY > 0? Math.PI/2 : 1.5*Math.PI;
+//		else {
+//			currRotation = Math.atan( deltaY/deltaX);
+//			if (deltaX < 0) currRotation += Math.PI;
+//		}
+//		super.rotation = (float)currRotation;
+		float screenCamX = Game.WIDTH/2;
+		float screenCamY = Game.HEIGHT/2;
+		super.rotation = TrigUtils.pointDirection(screenCamX, screenCamY, is.getMouseX(), is.getMouseY());
 
 		if (shootTimer == 0) {
 			if (is.isAction1()) {

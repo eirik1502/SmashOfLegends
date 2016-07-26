@@ -5,6 +5,7 @@ import org.json.simple.parser.JSONParser;
 
 import game.Game;
 import gameObjects.Enemy;
+import graphics.Camera;
 import graphics.GraphicsEntity;
 import graphics.GraphicsHandeler;
 import graphics.GraphicsUtils;
@@ -35,7 +36,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class Client {
 
 	
-	public static final Host serverHost = new Host("192.168.38.102", Server.PORT_NUMBER, -1);//"192.168.38.102", Server.PORT_NUMBER);
+	public static final Host serverHost = new Host("localhost", Server.PORT_NUMBER, -1);//"192.168.38.102", Server.PORT_NUMBER);
 	
 	public static String logFilepath = "src/network/clientLog.txt";
 	
@@ -52,6 +53,8 @@ public class Client {
 
 	//private GraphicsHandeler graphicsHandeler;
     //private long window;
+	private Camera camera;
+	
     private ClientCharacterEntity[] characters = new ClientCharacterEntity[2];
     private ArrayList<ClientBulletEntity> bullets = new ArrayList<>();
     private ArrayList<ClientEntity> entities = new ArrayList<>();
@@ -147,6 +150,7 @@ public class Client {
     	addEntity(characters[0]);
     	addEntity(characters[1]);
     	
+    	camera = new Camera(Game.WIDTH/2-200, Game.HEIGHT/2, Game.WIDTH, Game.HEIGHT);
     	//graphicsHandeler.addRenderable(unit);
 
     }
@@ -164,10 +168,13 @@ public class Client {
 			removeEntity(removeEntityBuffer.poll());
 		}
         
-    	ObjectsState objectsState = networkInput.getNextObjectsState();
+    	ClientObjectsState objectsState = networkInput.getNextObjectsState();
+    	NetCameraState cameraState = objectsState.getCameraState();
     	CharacterState player1State = objectsState.getPlayer1State();
     	CharacterState player2State = objectsState.getPlayer2State();
     
+    	camera.setX(cameraState.getX());
+    	camera.setY(cameraState.getY());
     	characters[0].setCharacterState(player1State);
     	characters[1].setCharacterState(player2State);
 
@@ -180,7 +187,7 @@ public class Client {
     
     
     private void render() {
-    	graphicsHandeler.render( new ArrayList<GraphicsEntity>(entities) );
+    	graphicsHandeler.render(camera, new ArrayList<GraphicsEntity>(entities) );
     }
     
     

@@ -19,7 +19,7 @@ public class SpecialBullet extends Bullet{
 	@Override
 	public void onPlayerCollision(Character c) {
 		applyDamage(c, DAMAGE);
-		
+		destroy();
 	}
 	
 }

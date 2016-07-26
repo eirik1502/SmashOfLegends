@@ -15,8 +15,10 @@ import gameObjects.Bullet;
 import gameObjects.Character;
 import gameObjects.Enemy;
 import gameObjects.Wall;
+import graphics.Camera;
 import graphics.Color;
 import graphics.Font;
+import maths.TrigUtils;
 import physics.Collideable;
 import physics.PhysicsHandeler;
 
@@ -27,6 +29,7 @@ public class GameRoom extends Room {
 	
 	
 	private Character player1, player2;
+	private Camera camera1, camera2;
 	private ArrayList<Enemy> enemies = new ArrayList<>();
 	private Board board;
 	
@@ -49,6 +52,10 @@ public class GameRoom extends Room {
 //		Wall.loadSprite();
 		player1 = new Character(300f, 300f);
 		player2 = new Character(1200f, 300f);
+		camera1 = new Camera(player1.getX(), player1.getY(), 100, 100);
+		camera2 = new Camera(player2.getX(), player2.getY(), 100, 100);
+		player1.setCamera(camera1);
+		player2.setCamera(camera2);
 		//board = new Board();
 		
 		//text = new Text("Heello world!", Font.getStandardFont(), 18, 200, 70, 0);
@@ -94,7 +101,17 @@ public class GameRoom extends Room {
 //		text.setString("Wave: " + enemyWave);
 		player1.update(this.player1InputState);
 		player2.update(this.player2InputState);
+		camera1.setX(player1.getX());
+		camera1.setY(player1.getY());
+		camera2.setX(player2.getX());
+		camera2.setY(player2.getY());
+		
 		super.update();
+	}
+	
+	public Camera[] getCameras() {
+		Camera[] cameras = {camera1, camera2};
+		return cameras;
 	}
 	
 	
@@ -165,6 +182,7 @@ public class GameRoom extends Room {
 	public boolean collideBoard(Collideable c) {
 		return board.collideGrid(c);
 	}
+
 	
 //	public void gameOver() {
 //		enemies.forEach(e -> removeEntity(e));
