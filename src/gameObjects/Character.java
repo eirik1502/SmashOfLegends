@@ -29,6 +29,7 @@ public class Character extends Entity implements Collideable {
 	private float radius;
 
 	private int hp = 100;
+	private float percent = 0;
 
 	private int shootTimer = 0;
 	private int shootDelay = 40;
@@ -166,12 +167,23 @@ public class Character extends Entity implements Collideable {
 	
 	private void respawn(){
 		hp = 100;
+		setPercent(0);
 		setX(startX);
 		setY(startY);
 	}
 	
 	public void addHp(int hp) {
 		this.hp += hp;
+	}
+	public void addPercent(float percent) {
+		this.percent += percent;
+	}
+	public void addKnockback(float direction, float knockback) {
+		x += TrigUtils.lengthdirX(knockback*(percent/100f), direction);
+		y += TrigUtils.lengthdirY(knockback*(percent/100f), direction);
+	}
+	private void setPercent(float value) {
+		this.percent = value;
 	}
 	
 	@Override

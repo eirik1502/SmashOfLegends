@@ -5,8 +5,8 @@ public class BasicBullet extends Bullet {
 
 	public static final byte BULLET_NR = 0;
 	public static final float RADIUS = 1;
-	public static final int DAMAGE = 34;
-	public static final float KNOCKBACK = 0;
+	public static final int DAMAGE = 10;
+	public static final float KNOCKBACK = 100;
 	public static final int TIMER = 60;
 	
 	private static final float SPEED = 19.5f;
@@ -19,7 +19,8 @@ public class BasicBullet extends Bullet {
 
 	@Override
 	public void onPlayerCollision(Character c) {
-		applyDamage(c, DAMAGE);
+		c.addPercent(DAMAGE);
+		c.addKnockback(super.rotation, KNOCKBACK);
 		destroy();
 	}
 
