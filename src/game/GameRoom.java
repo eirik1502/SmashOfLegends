@@ -52,11 +52,14 @@ public class GameRoom extends Room {
 //		Wall.loadSprite();
 		player1 = new Character(300f, 300f);
 		player2 = new Character(1200f, 300f);
+		
 		camera1 = new Camera(player1.getX(), player1.getY(), 100, 100);
 		camera2 = new Camera(player2.getX(), player2.getY(), 100, 100);
 		player1.setCamera(camera1);
 		player2.setCamera(camera2);
 		//board = new Board();
+		
+		board = new Board();
 		
 		//text = new Text("Heello world!", Font.getStandardFont(), 18, 200, 70, 0);
 				
@@ -68,7 +71,7 @@ public class GameRoom extends Room {
 		super.addEntity(player1);
 		super.addEntity(player2);
 		//genEnemy();
-//		super.addEntity(board);
+		super.addEntity(board);
 //		super.addText(text);
 //		super.addEntity(board);
 //		super.addEntity(rect1);
@@ -137,27 +140,27 @@ public class GameRoom extends Room {
 	public void removeBullet(Bullet bullet) {
 		removeEntity(bullet);
 	}
-	
-	private void genEnemy() {
-		float[] points = {0,0,   Game.WIDTH, 0,   0, Game.HEIGHT,   Game.WIDTH, Game.HEIGHT};
-		int pickPoint = 2 * (int)Math.floor(Math.random()*4);
-		float startX = points[pickPoint];
-		float startY = points[pickPoint+1];
-		Enemy newEnemy = new Enemy(startX, startY);
-		enemies.add(newEnemy);
-		addEntity(newEnemy);
-	}
+//	
+//	private void genEnemy() {
+//		float[] points = {0,0,   Game.WIDTH, 0,   0, Game.HEIGHT,   Game.WIDTH, Game.HEIGHT};
+//		int pickPoint = 2 * (int)Math.floor(Math.random()*4);
+//		float startX = points[pickPoint];
+//		float startY = points[pickPoint+1];
+//		Enemy newEnemy = new Enemy(startX, startY);
+//		enemies.add(newEnemy);
+//		addEntity(newEnemy);
+//	}
 	
 //	public Character getPlayer() {
 //		return player;
 //	}
-	public ArrayList<Enemy> getEnemies() {
-		return enemies;
-	}
-	public void  removeEnemy(Enemy e) {
-		enemies.remove(e);
-		removeEntity(e);
-	}
+//	public ArrayList<Enemy> getEnemies() {
+//		return enemies;
+//	}
+//	public void  removeEnemy(Enemy e) {
+//		enemies.remove(e);
+//		removeEntity(e);
+//	}
 //	private void removePlayer() {
 //		removeEntity(player);
 //		
@@ -171,16 +174,19 @@ public class GameRoom extends Room {
 		}
 		return null;
 	}
-	public Enemy collideEnemy(Collideable c) {
-		for (Enemy e : enemies) {
-			if (PhysicsHandeler.isCollision(c, e)) {
-				return e;
-			}
-		}
-		return null;
+//	public Enemy collideEnemy(Collideable c) {
+//		for (Enemy e : enemies) {
+//			if (PhysicsHandeler.isCollision(c, e)) {
+//				return e;
+//			}
+//		}
+//		return null;
+//	}
+	public boolean collideWall(Collideable c) {
+		return board.isCollisionWall(c);
 	}
-	public boolean collideBoard(Collideable c) {
-		return board.collideGrid(c);
+	public boolean collideHole(Collideable c) {
+		return board.isCollisionHole(c);
 	}
 
 	

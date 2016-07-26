@@ -38,6 +38,8 @@ public class Character extends Entity implements Collideable {
 	private Camera camera;
 	
 	private float startX, startY;
+	public GameRoom gameRoom;
+	
 
 	public Character( float startX, float startY ) {
 		super(200, 100, 0);
@@ -60,6 +62,7 @@ public class Character extends Entity implements Collideable {
 	
 	@Override
 	public void start() {
+		gameRoom = (GameRoom)super.room;
 	}
 	
 
@@ -89,12 +92,20 @@ public class Character extends Entity implements Collideable {
 
 		}
 		
-		Collideable baundaryBox = new Collideable() {
-			private PhShape boundaryBox = new PhRectangle(x-radius, y-radius, radius*2, radius*2);
-			public PhShape getPhShape() {
-				return boundaryBox;
-			}
-		};
+		if (gameRoom.collideHole(this)) {
+			respawn();
+		}
+		if (gameRoom.collideWall(this)) {
+			setX(lastX);
+			setY(lastY);
+		}
+		
+//		Collideable baundaryBox = new Collideable() {
+//			private PhShape boundaryBox = new PhRectangle(x-radius, y-radius, radius*2, radius*2);
+//			public PhShape getPhShape() {
+//				return boundaryBox;
+//			}
+//		};
 		
 //		if (groom.collideBoard(baundaryBox)) {
 //			x = lastX;
@@ -149,10 +160,14 @@ public class Character extends Entity implements Collideable {
 
 	private void checkDead() {
 		if (hp <= 0) {
-			hp = 100;
-			setX(startX);
-			setY(startY);
+			respawn();
 		}
+	}
+	
+	private void respawn(){
+		hp = 100;
+		setX(startX);
+		setY(startY);
 	}
 	
 	public void addHp(int hp) {
