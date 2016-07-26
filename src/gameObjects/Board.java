@@ -3,6 +3,9 @@ package gameObjects;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -10,8 +13,10 @@ import game.Game;
 import graphics.GraphicsHandeler;
 import graphics.Sprite;
 import physics.Collideable;
+import physics.PhCircle;
 import physics.PhRectangle;
 import physics.PhShape;
+import physics.PhysicsHandeler;
 import rooms.Entity;
 
 public class Board extends Entity {
@@ -22,12 +27,13 @@ public class Board extends Entity {
 	public static final int GRID_WIDTH = WIDTH/CELL_WIDTH, GRID_HEIGHT = HEIGHT/CELL_HEIGHT;
 	
 	private Wall[][] collisionGrid = new Wall[GRID_WIDTH][GRID_HEIGHT];
+	private List<Hole> holelist = new ArrayList<Hole>();
 	
 	
 	
 	public Board() {
-		super(new Sprite("res/background.png", 0, 0, -0.9f), 0, 0, 0);
-		
+		super(0, 0, 0);
+		setupHoles();
 		setupCollisionGrid();
 	}
 	
@@ -36,34 +42,51 @@ public class Board extends Entity {
 		createGridEntities();
 	}
 	
-	public boolean collideGrid(Collideable obj) {
-		PhRectangle objr = (PhRectangle)obj.getPhShape();
-		float objX = objr.getX();
-		float objY = objr.getY();
-		float objW = objr.getWidth();
-		float objH = objr.getHeight();
-		return wallInGridAreaGlobal(objX, objY, objW, objH);
+	private void setupHoles(){
+		holelist.add(new Hole(new PhRectangle(0,0,1600,40)));
+		holelist.add(new Hole(new PhRectangle(0,850,1600,20)));
+
+//		holelist.add(new Hole(new PhCircle(10,10,1)));
+//		holelist.add(new Hole(new PhRectangle(28,28,3,3)));
+//		holelist.add(new Hole(new PhRectangle(20,20,5,5)));
 	}
 	
-	private boolean wallInGridAreaGlobal(float globalX, float globalY, float globalW, float globalH) {
-		Wall[][] walls = getGridAreaGlobal(globalX, globalY, globalW, globalH);
-		for (int i = 0; i < walls.length; i++) {
-			for (int j = 0; j < walls[i].length; j++) {
-				if (walls[i][j] != null) return true;
+	public boolean isCollisionHole(Collideable c) {
+		for (Hole h: holelist){
+			if (PhysicsHandeler.isCollision(h,c)){
+				return true;
 			}
 		}
 		return false;
 	}
 	
-	private Wall[][] getGridAreaGlobal(float globalX, float globalY, float globalW, float globalH) {
-		int localX1 = getCellXLocal(globalX);
-		int localY1 = getCellYLocal(globalY);
-		int localX2 = getCellXLocal(globalX+globalW);
-		int localY2 = getCellYLocal(globalY+globalH);
+	public boolean isCollisionWall(Collideable c) {
+		PhRectangle rect = c.getPhShape().getBoundingBox();
+		Wall[][] walls = getGridAreaGlobal(rect);
+		for (int i = 0; i < walls.length; i++) {
+			for (int j = 0; j < walls[i].length; j++) {
+				if (walls[i][j] != null && PhysicsHandeler.isCollision(c, walls[i][j])) {
+					return true; 
+				}
+			}
+		}	
+		return false;
+	}
+			
+	
+	private Wall[][] getGridAreaGlobal(PhRectangle rect) {
+		float rectX = rect.getX();
+		float rectY = rect.getY();
+		float rectW = rect.getWidth();
+		float rectH = rect.getHeight();
+		int localX1 = getCellXLocal(rectX);
+		int localY1 = getCellYLocal(rectY);
+		int localX2 = getCellXLocal(rectX+rectW);
+		int localY2 = getCellYLocal(rectY+rectH);
 		int localW = localX2-localX1;
 		int localH = localY2-localY1;
 		
-		System.out.println("global: "+ globalX+" "+ globalY+" "+ globalW+" "+ globalH +" local: " + localX1+" "+ localY1+" "+ localW+" "+ localH);
+		System.out.println("global: "+ rectX+" "+ rectY+" "+ rectW+" "+ rectH +" local: " + localX1+" "+ localY1+" "+ localW+" "+ localH);
 		
 		Wall[][] cells = new Wall[localW][localH];
 		for (int i = 0; i < localW; i++) {
@@ -129,6 +152,7 @@ public class Board extends Entity {
 			}
 		}
 	}
+	
 
 
 //	@Override

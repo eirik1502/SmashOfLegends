@@ -35,7 +35,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class Client {
 
 	
-	public static final Host serverHost = new Host("192.168.38.102", Server.PORT_NUMBER, -1);//"192.168.38.102", Server.PORT_NUMBER);
+	public static final Host serverHost = new Host("127.0.0.1", Server.PORT_NUMBER, -1);//"192.168.38.102", Server.PORT_NUMBER);
 	
 	public static String logFilepath = "src/network/clientLog.txt";
 	
