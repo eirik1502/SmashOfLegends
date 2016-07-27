@@ -93,6 +93,8 @@ public abstract class ClientBulletEntity extends ClientEntity {
 	
 	@Override
 	public void update() {
+		super.update();
+		
 		if (timer-- == 0) client.removeBullet(this);
 		
 		x += Math.cos(rotation)*speed;

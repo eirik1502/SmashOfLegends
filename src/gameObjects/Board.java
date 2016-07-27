@@ -87,14 +87,19 @@ public class Board extends Entity {
 		int localH = localY2-localY1;
 		
 		System.out.println("global: "+ rectX+" "+ rectY+" "+ rectW+" "+ rectH +" local: " + localX1+" "+ localY1+" "+ localW+" "+ localH);
-		
-		Wall[][] cells = new Wall[localW][localH];
-		for (int i = 0; i < localW; i++) {
-			for (int j = 0; j < localH; j++) {
-				cells[i][j] = collisionGrid[i+localX1][j+localY1];
+		try {
+			Wall[][] cells = new Wall[localW][localH];
+			for (int i = 0; i < localW; i++) {
+				for (int j = 0; j < localH; j++) {
+					cells[i][j] = collisionGrid[i+localX1][j+localY1];
+				}
 			}
+			return cells;
 		}
-		return cells;
+		catch (ArrayIndexOutOfBoundsException e) {
+			Wall[][] walls = new Wall[0][0];
+			return walls;
+		}
 	}
 
 //	private void setCellGlobal(boolean value, float globalX, float globalY) {

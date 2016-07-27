@@ -182,6 +182,7 @@ public class Client {
     	for (NetBulletState b : objectsState.getBulletsCreatedState()) {
     		ClientBulletEntity bullet = ClientBulletEntity.getBulletByNumber(this, b);//new ClientBulletEntity(this, b, b.getSpeed());
     		addBullet(bullet);
+    		characters[0].shootAnimation();
     		System.out.println("Bullet created: "+bullet);
     	}
     }

@@ -77,7 +77,7 @@ class ClientNetworkInput implements Runnable {
                 	}
                 	
                 	ClientObjectsState objectsState = new ClientObjectsState(cameraState, player1State, player2State, bulletsState);
-                	System.out.println(objectsState);
+                	//System.out.println(objectsState);
                 	
                 	this.addObjectsState(objectsState);
                 	

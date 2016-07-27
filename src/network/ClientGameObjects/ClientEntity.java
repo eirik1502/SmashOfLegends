@@ -26,7 +26,7 @@ public abstract class ClientEntity extends GraphicsEntity implements Collideable
 	}
 	
 	public void update() {
-		
+		sprite.update();
 	}
 	
 	public float getX() {
