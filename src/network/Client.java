@@ -5,6 +5,7 @@ import org.json.simple.parser.JSONParser;
 
 import game.Game;
 import gameObjects.Enemy;
+import gameObjects.Equinox;
 import graphics.Camera;
 import graphics.GraphicsEntity;
 import graphics.GraphicsHandeler;
@@ -14,6 +15,7 @@ import network.ClientGameObjects.ClientBackground;
 import network.ClientGameObjects.ClientBulletEntity;
 import network.ClientGameObjects.ClientCharacterEntity;
 import network.ClientGameObjects.ClientEntity;
+import network.ClientGameObjects.ClientEquinox;
 import physics.Collideable;
 import physics.PhysicsHandeler;
 import rooms.Entity;
@@ -144,12 +146,19 @@ public class Client {
  
 		ClientCharacterEntity.loadSprite();
 		ClientBulletEntity.loadSprites();
+		ClientEquinox.loadSprite();
     	characters[0] = new ClientCharacterEntity(100, 100, 0);
     	characters[1] = new ClientCharacterEntity(100, 100, 0);
+    	
+    	ClientEquinox p1e = new ClientEquinox(this, Equinox.p1StartX, Equinox.p1StartY);
+    	ClientEquinox p2e = new ClientEquinox(this, Equinox.p2StartX, Equinox.p2StartY);
     	
     	addEntity(new ClientBackground());
     	addEntity(characters[0]);
     	addEntity(characters[1]);
+    	addEntity(p1e);
+    	addEntity(p2e);
+    	
     	
     	camera = new Camera(Game.WIDTH/2-200, Game.HEIGHT/2, Game.WIDTH, Game.HEIGHT);
     	//graphicsHandeler.addRenderable(unit);
@@ -207,6 +216,10 @@ public class Client {
     }
     public void addBullet(ClientBulletEntity bullet) {
     	addEntity(bullet);
+    }
+    
+    public void removeEquinox(ClientEquinox e) {
+    	this.removeEntity(e);
     }
     
 	private void addEntity(ClientEntity e) {
