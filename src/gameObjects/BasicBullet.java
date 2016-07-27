@@ -20,7 +20,7 @@ public class BasicBullet extends Bullet {
 	@Override
 	public void onPlayerCollision(Character c) {
 		c.addPercent(DAMAGE);
-		c.addKnockback(super.rotation, KNOCKBACK);
+		c.addKnockback(rotation, KNOCKBACK);
 		destroy();
 	}
 

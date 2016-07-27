@@ -50,8 +50,8 @@ public class GameRoom extends Room {
 //		Bullet.loadSprite();
 //		Enemy.loadSprite();
 //		Wall.loadSprite();
-		player1 = new Character(300f, 300f);
-		player2 = new Character(1200f, 300f);
+		player1 = new Character(298f, 435f);
+		player2 = new Character(4489f, 452f);
 		
 		camera1 = new Camera(player1.getX(), player1.getY(), 100, 100);
 		camera2 = new Camera(player2.getX(), player2.getY(), 100, 100);

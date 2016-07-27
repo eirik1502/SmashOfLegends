@@ -22,8 +22,8 @@ import rooms.Entity;
 public class Board extends Entity {
 
 	
-	public static final int WIDTH = 1600, HEIGHT = 900;
-	public static final int CELL_WIDTH = 16, CELL_HEIGHT = 16;
+	public static final int WIDTH = 4800, HEIGHT = 928;
+	public static final int CELL_WIDTH = 32, CELL_HEIGHT = 32;
 	public static final int GRID_WIDTH = WIDTH/CELL_WIDTH, GRID_HEIGHT = HEIGHT/CELL_HEIGHT;
 	
 	private Wall[][] collisionGrid = new Wall[GRID_WIDTH][GRID_HEIGHT];
@@ -43,12 +43,71 @@ public class Board extends Entity {
 	}
 	
 	private void setupHoles(){
-		holelist.add(new Hole(new PhRectangle(0,0,1600,40)));
-		holelist.add(new Hole(new PhRectangle(0,850,1600,20)));
+		//outer bound holes
+		holelist.add(new Hole(new PhRectangle(0,0,WIDTH,40)));
+		holelist.add(new Hole(new PhRectangle(0,850,WIDTH,20)));
+		
+		//on map circle holes
+		holelist.add(new Hole(new PhCircle(1764f, 323f, 36f)));
+		holelist.add(new Hole(new PhCircle(3173f, 582f, 36f)));
+		
+		//on map middle rectangle
+		holelist.add(new Hole(new PhRectangle(2451f, 372f, 26f, 182f)));
+	}
+	
+	
 
-//		holelist.add(new Hole(new PhCircle(10,10,1)));
-//		holelist.add(new Hole(new PhRectangle(28,28,3,3)));
-//		holelist.add(new Hole(new PhRectangle(20,20,5,5)));
+
+	private int getCellXLocal(float globalX) {
+		return (int)Math.floor(globalX / CELL_WIDTH);
+	}
+	private int getCellYLocal(float globalY) {
+		return (int)Math.floor(globalY / CELL_HEIGHT);
+	}
+
+	private void setupCollisionGrid() {
+		//behind base walls
+		createWallArea(0,3,		0,21);
+		createWallArea(149,3,	0,21);
+		
+		//random walls in middle
+		createWallArea(39,9,	1,9);
+		createWallArea(110,9,	1,9);
+		
+	}
+	
+	private void createWallArea(int x, int y, int w, int h) {
+		for (int i = x; i < x+w+1; i++) {
+			for (int j = y; j < y+h+1; j++) {
+				createWallCell(i, j);
+			}
+		}
+	}
+	
+	private void createWallCell(int i, int j) {
+		collisionGrid[i][j] = new Wall(CELL_WIDTH*i, CELL_HEIGHT*j, CELL_WIDTH, CELL_HEIGHT);
+	}
+	
+	private void createGridEntities() {
+		int gridW = collisionGrid.length;
+		int gridH;
+		for (int i = 0; i<gridW; i++) {
+			gridH = collisionGrid[i].length;
+			for (int j = 0; j<gridH; j++) {
+				Wall w = collisionGrid[i][j];
+				if (w != null) {
+					room.addEntity(w);
+				}
+				
+			}
+		}
+	}
+	private void fillGrid(Wall[][] grid, Wall value) {
+		for (int i = 0; i<grid.length; i++) {
+			for (int j = 0; j<grid[i].length; j++) {
+				grid[i][j] = value;
+			}
+		}
 	}
 	
 	public boolean isCollisionHole(Collideable c) {
@@ -86,7 +145,7 @@ public class Board extends Entity {
 		int localW = localX2-localX1;
 		int localH = localY2-localY1;
 		
-		System.out.println("global: "+ rectX+" "+ rectY+" "+ rectW+" "+ rectH +" local: " + localX1+" "+ localY1+" "+ localW+" "+ localH);
+		//System.out.println("global: "+ rectX+" "+ rectY+" "+ rectW+" "+ rectH +" local: " + localX1+" "+ localY1+" "+ localW+" "+ localH);
 		try {
 			Wall[][] cells = new Wall[localW][localH];
 			for (int i = 0; i < localW; i++) {
@@ -101,64 +160,6 @@ public class Board extends Entity {
 			return walls;
 		}
 	}
-
-//	private void setCellGlobal(boolean value, float globalX, float globalY) {
-//		int cellX = getCellX(globalX);
-//		int cellY = getCellY(globalY);
-//		grid[cellX][cellY] = value;
-//	}
-//	public Boolean getCellGlobal(float globalX, float globalY) {
-//		int cellX = getCellX(globalX);
-//		int cellY = getCellY(globalY);
-//		boolean cell = grid[cellX][cellY];
-//		return cell;
-//	}
-	private int getCellXLocal(float globalX) {
-		return (int)Math.floor(globalX / CELL_WIDTH);
-	}
-	private int getCellYLocal(float globalY) {
-		return (int)Math.floor(globalY / CELL_HEIGHT);
-	}
-
-	private void setupCollisionGrid() {
-		fillGrid(collisionGrid, null);
-		int gridW = collisionGrid.length;
-		int gridH;
-		for (int i = 0; i<gridW; i++) {
-			gridH = collisionGrid[i].length;
-			for (int j = 0; j<gridH; j++) {
-				if (i == 0 || i == gridW-1 || j == 0 || j == gridH-1) {
-					collisionGrid[i][j] = new Wall(CELL_WIDTH*i, CELL_HEIGHT*j, CELL_WIDTH, CELL_HEIGHT);
-				}
-				
-			}
-		}
-		
-	}
-	
-	private void createGridEntities() {
-		int gridW = collisionGrid.length;
-		int gridH;
-		for (int i = 0; i<gridW; i++) {
-			gridH = collisionGrid[i].length;
-			for (int j = 0; j<gridH; j++) {
-				Wall w = collisionGrid[i][j];
-				if (w != null) {
-					room.addEntity(w);
-				}
-				
-			}
-		}
-	}
-	private void fillGrid(Wall[][] grid, Wall value) {
-		for (int i = 0; i<grid.length; i++) {
-			for (int j = 0; j<grid[i].length; j++) {
-				grid[i][j] = value;
-			}
-		}
-	}
-	
-
 
 //	@Override
 //	public PhShape getPhShape() {

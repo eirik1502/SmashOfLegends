@@ -6,7 +6,7 @@ import graphics.Sprite;
 public class ClientBackground extends ClientEntity {
 
 	
-	private static String backgroundImage = "res/background_difuse.png";
+	private static String backgroundImage = "res/background_mvp.png";
 	
 	
 	public ClientBackground() {
