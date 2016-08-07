@@ -1,8 +1,12 @@
-package network;
+package network.server;
 
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
+
+import network.CharacterState;
+import network.NetBulletState;
+import network.NetCameraState;
 
 public class ServerObjectsState {
 

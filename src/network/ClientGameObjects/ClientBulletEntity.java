@@ -2,8 +2,8 @@ package network.ClientGameObjects;
 
 import graphics.Sprite;
 import network.CharacterState;
-import network.Client;
 import network.NetBulletState;
+import network.client.Client;
 import physics.Collideable;
 import physics.PhRectangle;
 import physics.PhShape;

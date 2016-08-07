@@ -9,6 +9,8 @@ public class TimerThread extends Thread {
 	
 	private EmptyActionListener listener;
 	
+	private boolean running = true;
+	
 	
 	public TimerThread(int length, EmptyActionListener listener) {
 		this(length, listener, 100);
@@ -23,11 +25,20 @@ public class TimerThread extends Thread {
 	public synchronized void reset() {
 		timePassed = 0;
 	}
+	public synchronized void terminate() {
+		running = false;
+		try {
+			this.join();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	@Override
 	public void run() {
 		// Put the timer to sleep
-		while(true) {
+		while(running) {
 			try
 			{ 
 				Thread.sleep(timerCheckRate);
@@ -46,10 +57,12 @@ public class TimerThread extends Thread {
 				// Check to see if the time has been exceeded
 				if (timePassed > timerLength)
 				{
-					// Trigger a timeout
-					listener.onAction();
-					if (timePassed > timerLength)
-						break;
+					if (running) {
+						// Trigger a timeout
+						listener.onAction();
+						if (timePassed > timerLength)
+							break;
+					}
 				}
 			}
 		}

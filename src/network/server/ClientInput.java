@@ -1,4 +1,4 @@
-package network;
+package network.server;
 
 public class ClientInput {
 

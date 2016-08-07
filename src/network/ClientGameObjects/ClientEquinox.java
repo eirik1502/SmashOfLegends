@@ -1,7 +1,7 @@
 package network.ClientGameObjects;
 
 import graphics.Sprite;
-import network.Client;
+import network.client.Client;
 import physics.PhRectangle;
 import physics.PhShape;
 

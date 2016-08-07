@@ -1,4 +1,4 @@
-package network;
+package network.client;
 
 
 import userInput.InputHandeler;
@@ -11,6 +11,9 @@ import java.io.*;
 import java.net.*;
 import java.util.Arrays;
 
+import network.baseConnection.Host;
+import network.server.Server;
+
  
 public class ClientNetworkOutput implements Runnable{
 
@@ -22,19 +25,25 @@ public class ClientNetworkOutput implements Runnable{
 	
 	private DatagramSocket socket;
 	
-	private LogWriter log;
+	//private LogWriter log;
 
     private InputHandeler inputHandeler;
     
     private float inputStateSendInterval;
     
+    private boolean running = true;
     
-    public ClientNetworkOutput(DatagramSocket socket, Host serverHost, float inputStateSendInterval, LogWriter log) {
+    
+    public ClientNetworkOutput(DatagramSocket socket, Host serverHost, float inputStateSendInterval) {
     	this.socket = socket;
     	this.serverHost = serverHost;
     	//this.inputHandeler = inputHandeler;
     	this.inputStateSendInterval = inputStateSendInterval;
-    	this.log = log;
+    	//this.log = log;
+    }
+    
+    public synchronized void terminate() {
+    	running = false;
     }
     
     public void run(){
@@ -56,7 +65,7 @@ public class ClientNetworkOutput implements Runnable{
 		int updates = 0;
 		int frames = 0;
 		
-		while(true) {
+		while(running) {
 			
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
@@ -72,7 +81,7 @@ public class ClientNetworkOutput implements Runnable{
 			frames++;
 			if (System.currentTimeMillis() - timer > 1000) { //1 second has past
 				timer += 1000;
-				log.println(updates + " ups, " + frames + " fps"+ "---------------------------------------");
+				//log.println(updates + " ups, " + frames + " fps"+ "---------------------------------------");
 				updates = 0;
 				frames = 0;
 			}
@@ -115,12 +124,12 @@ public class ClientNetworkOutput implements Runnable{
 	        out.writeBoolean(ac1);
 	        out.writeBoolean(ac2);
 	        
-	        log.println("Bytes sending: " + out.size() );
+	        //log.println("Bytes sending: " + out.size() );
 	        byte[] bytes = byteStream.toByteArray();
-	        log.print("Bytes to send: " + Arrays.toString(bytes) +"..");
-	        DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getReceivePort());
+	        //log.print("Bytes to send: " + Arrays.toString(bytes) +"..");
+	        DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getUdpPort());
 	        socket.send(datagram);
-	        log.println("SUCSESS");
+	        //log.println("SUCSESS");
 	        
 	        
 		} catch (IOException e) {

@@ -3,8 +3,8 @@ package network.ClientGameObjects;
 import gameObjects.BasicBullet;
 import graphics.Sprite;
 import network.CharacterState;
-import network.Client;
 import network.NetBulletState;
+import network.client.Client;
 
 public class ClientBasicBullet extends ClientBulletEntity {
 

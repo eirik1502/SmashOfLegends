@@ -1,4 +1,4 @@
-package network;
+package network.server;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -8,6 +8,10 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
+
+import network.EmptyActionListener;
+import network.TimerThread;
+import network.baseConnection.Host;
 
 
 class ServerNetworkInput extends Thread {
@@ -94,7 +98,7 @@ class ServerNetworkInput extends Thread {
     private void handleJoinRequest(DataInputStream in, Host client) throws IOException {
 		int receivePort = in.readInt();
 		
-		client.setReceivePort(receivePort);
+		client.setUdpPort(receivePort);
 		
 		int clientNumber = server.connectClient(client);
 		boolean requestResponse = false;

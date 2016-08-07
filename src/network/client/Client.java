@@ -1,21 +1,25 @@
-package network;
+package network.client;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import game.Game;
 import gameObjects.Enemy;
 import gameObjects.Equinox;
 import graphics.Camera;
+import graphics.Font;
 import graphics.GraphicsEntity;
 import graphics.GraphicsHandeler;
 import graphics.GraphicsUtils;
 import graphics.Sprite;
+import network.CharacterState;
+import network.NetBulletState;
+import network.NetCameraState;
 import network.ClientGameObjects.ClientBackground;
 import network.ClientGameObjects.ClientBulletEntity;
 import network.ClientGameObjects.ClientCharacterEntity;
 import network.ClientGameObjects.ClientEntity;
 import network.ClientGameObjects.ClientEquinox;
+import network.baseConnection.Host;
+import network.server.Server;
 import physics.Collideable;
 import physics.PhysicsHandeler;
 import rooms.Entity;
@@ -25,6 +29,9 @@ import utils.LogWriter;
 
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
 
 import java.io.*;
 import java.net.*;
@@ -39,12 +46,12 @@ public class Client {
 
 	
 
-	public static final Host serverHost = new Host("127.0.0.1", Server.PORT_NUMBER, -1);//"192.168.38.102", Server.PORT_NUMBER);
+	public static final Host serverHost = new Host("", -1, Server.PORT_NUMBER);//"192.168.38.102", Server.PORT_NUMBER);
 	
 	public static String logFilepath = "src/network/clientLog.txt";
 	
 	
-	private LogWriter log;
+	//private LogWriter log;
 	
 	private DatagramSocket receiveSocket, sendSocket;
 	
@@ -83,7 +90,7 @@ public class Client {
     
     public void start(){
         
-    	log = new LogWriter(logFilepath);
+    	//log = new LogWriter(logFilepath);
     	setupOther();//call this first
     	setupNetwork();
     	
@@ -96,40 +103,40 @@ public class Client {
     private void setupNetwork() {
     	try {
     		
-    		log.print("About to create DatagramSocket.. ");
+    		//log.print("About to create DatagramSocket.. ");
 			receiveSocket = new DatagramSocket();
 			sendSocket = new DatagramSocket();
 			//System.out.println("sockets ports: " + receiveSocket.getPort() + ", " + sendSocket.get);
-			log.println("SUCSESS");
+			//log.println("SUCSESS");
 			
 			
-			log.print("About to setup connection to server: " + serverHost.toString() +".. ");
-			log.flush();
+			//log.print("About to setup connection to server: " + serverHost.toString() +".. ");
+			//log.flush();
 	        boolean connected = false;
 	        int tries = 0;
 	        while (!connected) {
 	        	connected = connectToServer(serverHost, receiveSocket, sendSocket);
 	        	if (tries++ == 10) {
-	        		log.errPrintln("\nTried to connect to server " + (tries) + " times, no sucsess:");
-	        		log.errPrintln("-- server might be offline\n-- too many packets lost");
-	        		log.flush();
+	        		//log.errPrintln("\nTried to connect to server " + (tries) + " times, no sucsess:");
+	        		//log.errPrintln("-- server might be offline\n-- too many packets lost");
+	        		//log.flush();
 	        		throw new IllegalStateException("Tried to connect to server " + tries + " times, no sucsess..");
 	        	}
 	        }
-	        log.println("SUCSESS after " + (tries) +" connection attempts");
-	        log.flush();
+	      //  log.println("SUCSESS after " + (tries) +" connection attempts");
+	        //log.flush();
 	        
-	        log.println("Setting up network output thread..");
-	        networkOutput = new ClientNetworkOutput(sendSocket, serverHost, inputStateSendInterval,  log);
+	        //log.println("Setting up network output thread..");
+	        networkOutput = new ClientNetworkOutput(sendSocket, serverHost, inputStateSendInterval);
 	        networkOutputThread = new Thread(networkOutput);
 	        networkOutputThread.start();
-	        log.printlnSucsess("network output thread");
+	        //log.printlnSucsess("network output thread");
 	        
-	        log.println("Setting up network input thread..");
-	        networkInput = new ClientNetworkInput(receiveSocket, log);
+	        //log.println("Setting up network input thread..");
+	        networkInput = new ClientNetworkInput(receiveSocket);
 	        networkInputThread = new Thread(networkInput);
 	        networkInputThread.start();
-	        log.printlnSucsess("network input thread");
+	        //log.printlnSucsess("network input thread");
 		}
     	catch (SocketException e) {
 			e.printStackTrace();
@@ -143,6 +150,20 @@ public class Client {
     	window = GraphicsUtils.createWindowOpenGl(Game.WIDTH, Game.HEIGHT, "Smash of Legends");
 		graphicsHandeler = new GraphicsHandeler(window, Game.WIDTH, Game.HEIGHT);
 		inputHandeler = new InputHandeler(window);
+		
+		//get ip
+		IpUserInput ipInput = new IpUserInput(graphicsHandeler);
+		String ip = ipInput.getInput();
+		if (ip == "") {
+			glfwDestroyWindow(window);
+			glfwTerminate();
+			System.exit(-1);
+		}
+		String connectingText = "Trying to connect to server at '" + ip + "', please wait ...";
+		Text[] texts = { new Text(connectingText, Font.getStandardFont(), 18, 300f, 150f, 0) };
+		graphicsHandeler.renderTexts(texts);
+		serverHost.setAddress(ip);
+		
  
 		ClientCharacterEntity.loadSprite();
 		ClientBulletEntity.loadSprites();
@@ -251,7 +272,7 @@ public class Client {
 		int updates = 0;
 		int frames = 0;
 		
-		while(true) {
+		while(!glfwWindowShouldClose(window)) {
 			
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
@@ -274,6 +295,21 @@ public class Client {
 				frames = 0;
 			}
 		}
+		
+		networkInput.terminate();
+		networkOutput.terminate();
+		try {
+			networkInputThread.join();
+			networkOutputThread.join();
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		this.sendSocket.close();
+		this.receiveSocket.close();
+		glfwDestroyWindow(window);
+		glfwTerminate();
     }
     
     
@@ -286,10 +322,10 @@ public class Client {
 	    	byte[] bytes = bbuffer.array();
 	    	int a = 12;
 	    	
-	    	DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getReceivePort());
+	    	DatagramPacket datagram = new DatagramPacket(bytes, bytes.length, serverHost.getAddress(), serverHost.getUdpPort());
 			sendSocket.send(datagram);
 			Host dummyHost = new Host("192.168.38.103", 1000, 1000);
-			DatagramPacket dummyDatagram = new DatagramPacket(new byte[0], 0, dummyHost.getAddress(), dummyHost.getReceivePort());
+			DatagramPacket dummyDatagram = new DatagramPacket(new byte[0], 0, dummyHost.getAddress(), dummyHost.getUdpPort());
 			receiveSocket.send(dummyDatagram); //
 			System.out.println("Join request sendt");
 			

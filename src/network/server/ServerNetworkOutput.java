@@ -1,4 +1,4 @@
-package network;
+package network.server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -8,6 +8,10 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 
 import gameObjects.Bullet;
+import network.CharacterState;
+import network.NetBulletState;
+import network.NetCameraState;
+import network.baseConnection.Host;
 import rooms.Entity;
 
 public class ServerNetworkOutput {
@@ -92,7 +96,7 @@ public class ServerNetworkOutput {
 //    	System.out.println(client.getAddress());
 //    	System.out.println(client.getReceivePort());
     	try {
-    		DatagramPacket packet = new DatagramPacket( data, data.length, client.getAddress(), client.getReceivePort() );
+    		DatagramPacket packet = new DatagramPacket( data, data.length, client.getAddress(), client.getUdpPort() );
 			socket.send(packet);
 			
 		} catch (IOException e) {

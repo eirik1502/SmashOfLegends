@@ -1,4 +1,4 @@
-package network;
+package network.server;
 
 import java.net.*;
 import java.io.*;
@@ -12,6 +12,10 @@ import org.json.simple.JSONObject;
 import game.Game;
 import gameObjects.Bullet;
 import graphics.Camera;
+import network.CharacterState;
+import network.NetBulletState;
+import network.NetCameraState;
+import network.baseConnection.Host;
 import rooms.Entity;
 
 public class Server{

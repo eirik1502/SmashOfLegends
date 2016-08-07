@@ -1,4 +1,4 @@
-package network;
+package network.client;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -8,6 +8,10 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import network.CharacterState;
+import network.NetBulletState;
+import network.NetCameraState;
+import network.server.Server;
 import utils.LogWriter;
 
 class ClientNetworkInput implements Runnable {
@@ -16,23 +20,29 @@ class ClientNetworkInput implements Runnable {
     private DatagramSocket socket; //UDP
     private DatagramPacket datagramPacket;
     
-    private LogWriter log;
+    //private LogWriter log;
     
     
     private ConcurrentLinkedDeque<ClientObjectsState> objectsStateQueue = new ConcurrentLinkedDeque<>();
     private ClientObjectsState lastObjectsState = new ClientObjectsState();
 
+    private boolean running = true;
     
-    public ClientNetworkInput(DatagramSocket socket, LogWriter log) {
+    
+    public ClientNetworkInput(DatagramSocket socket) {
         this.socket = socket;
-        this.log = log;
+        //this.log = log;
+    }
+    
+    public synchronized void terminate() {
+    	running = false;
     }
 
     public void run(){
 
         try {
 
-            while (true) {
+            while (running) {
 
             	byte[] bytes = new byte[Server.SEND_GAME_DATA_BYTE_SIZE_MAX];
     			datagramPacket = new DatagramPacket(bytes, bytes.length);
@@ -103,7 +113,7 @@ class ClientNetworkInput implements Runnable {
     
     public ClientObjectsState getNextObjectsState() {
     	if (objectsStateQueue.isEmpty()) {
-    		log.println("objectStateQueue is empty, returning last state");
+    		//log.println("objectStateQueue is empty, returning last state");
     		lastObjectsState.clearBullets();
     		return this.lastObjectsState;
     	}
