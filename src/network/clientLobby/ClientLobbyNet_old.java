@@ -1,33 +1,40 @@
-package network;
+package network.clientLobby;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import graphics.Text;
+import network.ChatMessage;
+import network.LobbyNet;
 import network.baseConnection.NetInData;
 import network.baseConnection.NetOutData;
 import network.baseConnection.SingleHostNet;
-import rooms.Text;
 
 
-public class ClientLobbyNet {
+public class ClientLobbyNet_old {
 
 
 	private SingleHostNet serverConnection;
 	private NetOutData outData;
 	
-	private HashMap<Integer, ConnectedClient> connectedClients = new HashMap<>();
+	private ConcurrentLinkedDeque<NetInData> bufferedInData = new ConcurrentLinkedDeque<>();
 	
-	private ConcurrentLinkedDeque<ConnectedClient> challengeRequests = new ConcurrentLinkedDeque<>();
-	private ConcurrentLinkedDeque<ChatMessage> chatMessages = new ConcurrentLinkedDeque<>();
+//	private HashMap<Integer, ConnectedClientImage> connectedClients = new HashMap<>();
+	
+//	private ConcurrentLinkedDeque<ConnectedClientImage> clientsConnected = new ConcurrentLinkedDeque<>();
+//	private ConcurrentLinkedDeque<ConnectedClientImage> clientsDisconnected = new ConcurrentLinkedDeque<>();
+//	private ConcurrentLinkedDeque<ConnectedClientImage> challengeRequests = new ConcurrentLinkedDeque<>();
+//	private ConcurrentLinkedDeque<ConnectedClientImage> challengeRequestDeclines = new ConcurrentLinkedDeque<>();
+//	private ConcurrentLinkedDeque<ChatMessage> chatMessages = new ConcurrentLinkedDeque<>();
+	
+//	
+//	private boolean lobbyJoined = false; //set when received joinLobbyResponse. Will not handle other messages before set.
+//	private boolean challengeAccepted = false; //set when challengeResponse is sendt
+//	private boolean gotoGame = false; //set when challengeResponse is received after it is sendt, and accepted == true
 	
 	
-	private boolean lobbyJoined = false; //set when received joinLobbyResponse. Will not handle other messages before set.
-	private boolean challengeAccepted = false; //set when challengeResponse is sendt
-	private boolean gotoGame = false; //set when challengeResponse is received after it is sendt, and accepted == true
-	
-	
-	public ClientLobbyNet(SingleHostNet serverConnection) {
+	public ClientLobbyNet_old(SingleHostNet serverConnection) {
 		this.serverConnection = serverConnection;
 		serverConnection.setTcpDataInListener((data) -> onTcpData(data));
 		serverConnection.setUdpDataInListener((data)-> {throw new IllegalArgumentException("Should not receive udp data in lobby");});
@@ -38,7 +45,7 @@ public class ClientLobbyNet {
 	public boolean challengeRequestWaiting() {
 		return challengeRequests.isEmpty();
 	}
-	public ConnectedClient pollChallengeRequest() {
+	public ConnectedClientImage pollChallengeRequest() {
 		return challengeRequests.poll();
 	}
 	public boolean chatMessageWaiting() {
@@ -47,6 +54,57 @@ public class ClientLobbyNet {
 	public ChatMessage pollChatMessage() {
 		return chatMessages.poll();
 	}
+	public boolean clientsConnectedWaiting() {
+		return clientsConnected.isEmpty();
+	}
+	public ConnectedClientImage pollClientConnected() {
+		return clientsConnected.poll();
+	}
+	public boolean clientsDisconnectedWaiting() {
+		return clientsDisconnected.isEmpty();
+	}
+	public ConnectedClientImage pollClientDisconnected() {
+		return clientsDisconnected.poll();
+	}
+	
+	
+	public boolean requestChallenge(ConnectedClientImage client) {
+		if (challengeAccepted) {
+			return false;
+		}
+		this.sendChallengeRequest(client);
+		return true;	
+	}
+	public boolean acceptChallenge(ConnectedClientImage client) {
+		if (challengeAccepted) {
+			return false;
+		}
+		synchronized(this) {
+			challengeAccepted = true;
+		}
+		this.sendChallengeResponse(client, true);
+		return true;
+	}
+	public boolean declineChallenge(ConnectedClientImage client) {
+		if (challengeAccepted) {
+			return false;
+		}
+		this.sendChallengeResponse(client, false);
+		return true;
+	}
+	
+	
+	public boolean isLobbyJoined() {
+		return this.lobbyJoined;
+	}
+	public boolean isChallengeAccepted() {
+		return this.challengeAccepted;
+	}
+	public boolean isGotoGame() {
+		return this.gotoGame;
+	}
+	
+
 	
 	public boolean joinLobby(String name) {
 		if (lobbyJoined) {
@@ -87,7 +145,7 @@ public class ClientLobbyNet {
 	}
 	
 	//type - targetClient(int) - challengeType(int) - challengeMsg(string)
-	public void sendChallengeRequest(ConnectedClient client) {
+	public void sendChallengeRequest(ConnectedClientImage client) {
 		outData.clear();
 		writeMessageType(outData, LobbyNet.CHALLENGE_REQUEST);
 		outData.writeInt(client.getNumber());
@@ -97,7 +155,7 @@ public class ClientLobbyNet {
 	}
 	
 	//type - tagetClient(int) - accepted(boolean)
-	public void sendChallengeResponse(ConnectedClient client, boolean accept) {
+	public void sendChallengeResponse(ConnectedClientImage client, boolean accept) {
 		sendChallengeResponse(client.getNumber(), accept);
 		
 	}
@@ -119,7 +177,7 @@ public class ClientLobbyNet {
 	
 
 	private void receiveChatMessage(int clientID, String msg) {
-		ConnectedClient client = connectedClients.get(clientID);
+		ConnectedClientImage client = connectedClients.get(clientID);
 		chatMessages.add( new ChatMessage(client, msg) );
 	}
 	private void receiveChallengeRequest(int clientID, String msg) {
@@ -141,7 +199,7 @@ public class ClientLobbyNet {
 				}
 			}
 			else { //other client declined our challengeRequest
-				ConnectedClient client = connectedClients.get(clientID);
+				ConnectedClientImage client = connectedClients.get(clientID);
 				synchronized( client ) {
 					client.declineChallenge();
 				}
@@ -151,7 +209,12 @@ public class ClientLobbyNet {
 	
 	//general
 	private synchronized void receiveJoinLobbyResponse(int statusCode) {
-		lobbyJoined = true;
+		if (statusCode == 1) { //1-OK
+			lobbyJoined = true;
+		}
+		else {
+			throw new IllegalArgumentException("server did not accept our join lobby request");
+		}
 	}
 	private void receiveClientConnected(int client, String name) {
 		addClient(client, name);
@@ -164,11 +227,51 @@ public class ClientLobbyNet {
 	}
 	
 	
+	
+	
+	private void writeMessageType(NetOutData data, byte messageType) {
+		data.writeByte(messageType);
+	}
+	private byte readMessageType(NetInData data) {
+		return data.readByte();
+	}
+	private ConnectedClientImage getClient(int clientID) {
+		return connectedClients.get(clientID);
+	}
+	
+	private void addClient(int clientNumber, String name) {
+		ConnectedClientImage client = new ConnectedClientImage(this, clientNumber, name);
+		connectedClients.put(clientNumber, client);
+		clientConnected.add(client);
+	}
+//	private void removeClient(ConnectedClientImage client) {
+//		removeClient( client.getNumber() );
+//	}
+	private void removeClient(int clientID) {
+		ConnectedClientImage client = connectedClients.get(clientID);
+		connectedClients.remove(clientID);
+		clientDisconnected.add(client);
+	}
+	
+	public SingleHostNet getConnection() {
+		return this.serverConnection;
+	}
+	
+	
+	
+	//delegate data to methods based on msgType
 	private void onTcpData(NetInData data) {
+		int messageType = readMessageType(data);
+		if 	(messageType == LobbyNet.JOIN_LOBBY_RESPONSE) {
+			int statusCode = data.readInt();
+			this.receiveJoinLobbyResponse(statusCode);
+			return;
+		}
 		if (! this.lobbyJoined) return;
+		
 		if (this.gotoGame) return;
 		
-		int messageType = readMessageType(data);
+		
 		int clientId;
 		
 		if (messageType == LobbyNet.CHALLENGE_RESPONSE) {
@@ -176,6 +279,7 @@ public class ClientLobbyNet {
 			boolean accepted = data.readBoolean();
 			
 			receiveChallengeResponse(clientId, accepted);
+			return;
 		}
 		if (this.challengeAccepted) return;
 		
@@ -205,36 +309,11 @@ public class ClientLobbyNet {
 			clientId = data.readInt(); //opponent
 			this.receiveGotoGameRequest(clientId);
 			break;
-		case LobbyNet.JOIN_LOBBY_RESPONSE:
-			int statusCode = data.readInt();
-			this.receiveJoinLobbyResponse(statusCode);
-			break;
+
 		default:
 			throw new IllegalArgumentException("client got data that it should not get, messageType: "+ messageType);
 		}
 		
 	}
-	
-	private void writeMessageType(NetOutData data, byte messageType) {
-		data.writeByte(messageType);
-	}
-	private byte readMessageType(NetInData data) {
-		return data.readByte();
-	}
-	private ConnectedClient getClient(int clientID) {
-		return connectedClients.get(clientID);
-	}
-	
-	private void addClient(int clientNumber, String name) {
-		ConnectedClient client = new ConnectedClient(this, clientNumber, name);
-		connectedClients.put(clientNumber, client);
-	}
-	private void removeClient(ConnectedClient client) {
-		removeClient( client.getNumber() );
-	}
-	private void removeClient(int clientID) {
-		connectedClients.remove(clientID);
-	}
-	
 
 }

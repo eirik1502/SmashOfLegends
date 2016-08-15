@@ -1,9 +1,10 @@
-package network;
+package network.clientLobby;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import rooms.Text;
+import graphics.Text;
+import network.ChatMessage;
 
 public class ChatMessageContainer {
 
@@ -42,6 +43,10 @@ public class ChatMessageContainer {
 			texts[i] = messages.get(i).getText();
 		}
 		return texts;
+	}
+	
+	public ArrayList<ChatMessage> getChatMessages() {
+		return new ArrayList<ChatMessage>(this.messages);
 	}
 	
 	private void removeOldestMessage() {

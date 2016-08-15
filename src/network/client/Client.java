@@ -1,15 +1,13 @@
 package network.client;
 
 
-import game.Game;
-import gameObjects.Enemy;
-import gameObjects.Equinox;
 import graphics.Camera;
 import graphics.Font;
 import graphics.GraphicsEntity;
 import graphics.GraphicsHandeler;
 import graphics.GraphicsUtils;
 import graphics.Sprite;
+import graphics.Text;
 import network.CharacterState;
 import network.NetBulletState;
 import network.NetCameraState;
@@ -22,8 +20,10 @@ import network.baseConnection.Host;
 import network.server.Server;
 import physics.Collideable;
 import physics.PhysicsHandeler;
-import rooms.Entity;
-import rooms.Text;
+import serverGame.Entity;
+import serverGame.Game;
+import serverGame.entities.Enemy;
+import serverGame.entities.Equinox;
 import userInput.InputHandeler;
 import utils.LogWriter;
 
@@ -41,6 +41,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+
+import clientGame.net.ClientGameState;
  
 public class Client {
 
@@ -199,7 +201,7 @@ public class Client {
 			removeEntity(removeEntityBuffer.poll());
 		}
         
-    	ClientObjectsState objectsState = networkInput.getNextObjectsState();
+    	ClientGameState objectsState = networkInput.getNextObjectsState();
     	NetCameraState cameraState = objectsState.getCameraState();
     	CharacterState player1State = objectsState.getPlayer1State();
     	CharacterState player2State = objectsState.getPlayer2State();

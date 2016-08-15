@@ -1,10 +1,10 @@
 package network.ClientGameObjects;
 
-import gameObjects.BasicBullet;
-import gameObjects.SpecialBullet;
 import graphics.Sprite;
 import network.NetBulletState;
 import network.client.Client;
+import serverGame.entities.BasicBullet;
+import serverGame.entities.SpecialBullet;
 
 public class ClientSpecialBullet extends ClientBulletEntity {
 

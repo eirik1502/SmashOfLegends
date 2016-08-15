@@ -6,7 +6,8 @@ import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import graphics.Font;
 import graphics.GraphicsHandeler;
 import graphics.GraphicsUtils;
-import rooms.Text;
+import graphics.Text;
+import network.clientLobby.ChatMessageContainer;
 
 public class TextBoxTest {
 

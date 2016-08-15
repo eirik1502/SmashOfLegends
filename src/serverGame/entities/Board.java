@@ -1,4 +1,4 @@
-package gameObjects;
+package serverGame.entities;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import game.Game;
 import graphics.GraphicsHandeler;
 import graphics.Sprite;
 import physics.Collideable;
@@ -17,7 +16,8 @@ import physics.PhCircle;
 import physics.PhRectangle;
 import physics.PhShape;
 import physics.PhysicsHandeler;
-import rooms.Entity;
+import serverGame.Entity;
+import serverGame.Game;
 
 public class Board extends Entity {
 

@@ -8,6 +8,7 @@ import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import clientGame.net.ClientGameState;
 import network.CharacterState;
 import network.NetBulletState;
 import network.NetCameraState;
@@ -23,8 +24,8 @@ class ClientNetworkInput implements Runnable {
     //private LogWriter log;
     
     
-    private ConcurrentLinkedDeque<ClientObjectsState> objectsStateQueue = new ConcurrentLinkedDeque<>();
-    private ClientObjectsState lastObjectsState = new ClientObjectsState();
+    private ConcurrentLinkedDeque<ClientGameState> objectsStateQueue = new ConcurrentLinkedDeque<>();
+    private ClientGameState lastObjectsState = new ClientGameState();
 
     private boolean running = true;
     
@@ -86,7 +87,7 @@ class ClientNetworkInput implements Runnable {
                     	bulletsState.add(bulletState);
                 	}
                 	
-                	ClientObjectsState objectsState = new ClientObjectsState(cameraState, player1State, player2State, bulletsState);
+                	ClientGameState objectsState = new ClientGameState(cameraState, player1State, player2State, bulletsState);
                 	//System.out.println(objectsState);
                 	
                 	this.addObjectsState(objectsState);
@@ -107,17 +108,17 @@ class ClientNetworkInput implements Runnable {
         }
     }
     
-    private void addObjectsState(ClientObjectsState objectsState) {
+    private void addObjectsState(ClientGameState objectsState) {
     	this.objectsStateQueue.add(objectsState);
     }
     
-    public ClientObjectsState getNextObjectsState() {
+    public ClientGameState getNextObjectsState() {
     	if (objectsStateQueue.isEmpty()) {
     		//log.println("objectStateQueue is empty, returning last state");
     		lastObjectsState.clearBullets();
     		return this.lastObjectsState;
     	}
-    	ClientObjectsState nextState = this.objectsStateQueue.poll();
+    	ClientGameState nextState = this.objectsStateQueue.poll();
     	lastObjectsState = nextState;
     	//log.println("Returning next objectsState: " + nextState);
     	return nextState;

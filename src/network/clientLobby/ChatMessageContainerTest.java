@@ -1,8 +1,10 @@
-package network;
+package network.clientLobby;
 
 import graphics.GraphicsHandeler;
 import graphics.GraphicsUtils;
-import rooms.Text;
+import graphics.Text;
+import network.ChatMessage;
+
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 

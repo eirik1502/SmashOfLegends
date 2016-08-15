@@ -1,7 +1,7 @@
-package gameObjects;
+package serverGame.entities;
 
-import rooms.Entity;
-import game.GameRoom;
+import serverGame.Entity;
+import serverGame.ServerGame;
 
 
 public class Equinox extends Entity {
@@ -20,7 +20,7 @@ public class Equinox extends Entity {
 	
 	
 	public void destroy() {
-		GameRoom groom = (GameRoom)super.room;
+		ServerGame groom = (ServerGame)super.room;
 		groom.removeEntity(this);
 		
 		

@@ -1,4 +1,4 @@
-package gameObjects;
+package serverGame.entities;
 
 import com.sun.xml.internal.stream.Entity;
 

@@ -25,7 +25,8 @@ public class JoinRequestHandeler extends Thread{
 	public synchronized void terminate() {
 		running = false;
 		try {
-			serverSocket.close();
+			serverSocket.close(); //must do to terminate loop
+			//if (serverSocket != null && !serverSocket.isClosed()) serverSocket.close();
 			this.join();
 		}
 		catch (IOException e) {
@@ -57,12 +58,14 @@ public class JoinRequestHandeler extends Thread{
 		}
 		catch (SocketException e) {
 			//if socket is closed on terminate
+			//System.out.println("JoinRequestHandeler terminating because of socket shutDown");
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
 		finally {
+			System.out.println("JoinRequestHandeler terminating");
 			try {
 				if (serverSocket != null && !serverSocket.isClosed()) serverSocket.close();
 			}

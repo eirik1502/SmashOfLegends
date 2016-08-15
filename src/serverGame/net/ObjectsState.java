@@ -1,7 +1,10 @@
-package network;
+package serverGame.net;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
+
+import network.CharacterState;
+import network.NetBulletState;
 
 public class ObjectsState {
 

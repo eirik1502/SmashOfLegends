@@ -1,7 +1,8 @@
 package network;
 
 import graphics.Font;
-import rooms.Text;
+import graphics.Text;
+import network.clientLobby.ConnectedClientImage;
 
 public class ChatMessage {
 
@@ -11,11 +12,11 @@ public class ChatMessage {
 	private float x, y, width, height;
 	private float marginLeft = 10f, marginRight = 10f, marginTop = 10f, marginBottom = 10f;
 	
-	private ConnectedClient ownerClient;
+	private ConnectedClientImage ownerClient;
 	private String startString;
 	
 	
-	public ChatMessage(ConnectedClient ownerClient, String text) {
+	public ChatMessage(ConnectedClientImage ownerClient, String text) {
 		startString = text;
 		this.ownerClient = ownerClient;
 		this.textBox = new TextBox( 0f, 0f, 0f, Font.getStandardFont(), 18);
@@ -32,10 +33,14 @@ public class ChatMessage {
 
 	}
 	
+	public String getString() {
+		return textBox.getString();
+	}
+	
 	public Text getText() {
 		return textBox.getGraphicsText();
 	}
-	public ConnectedClient getOwnerClient() {
+	public ConnectedClientImage getOwnerClient() {
 		return ownerClient;
 	}
 	

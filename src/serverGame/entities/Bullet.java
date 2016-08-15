@@ -1,16 +1,16 @@
-package gameObjects;
+package serverGame.entities;
 
-import game.Game;
-import game.GameRoom;
 import graphics.Sprite;
 import maths.TrigUtils;
 import physics.Collideable;
 import physics.PhRectangle;
 import physics.PhShape;
 import physics.PhysicsHandeler;
-import rooms.Entity;
 import rooms.Room;
 import rooms.Updateable;
+import serverGame.Entity;
+import serverGame.Game;
+import serverGame.ServerGame;
 import userInput.InputState;
 
 public abstract class Bullet extends Entity implements Updateable, Collideable{
@@ -24,7 +24,7 @@ public abstract class Bullet extends Entity implements Updateable, Collideable{
 	private float damage;
 	private float knockback;
 	
-	public GameRoom gameRoom;
+	public ServerGame gameRoom;
 	
 	private float speed;
 	
@@ -44,7 +44,7 @@ public abstract class Bullet extends Entity implements Updateable, Collideable{
 	
 	@Override
 	public void start() {
-		gameRoom = (GameRoom)this.room;
+		gameRoom = (ServerGame)this.room;
 	}
 	
 	public abstract void onPlayerCollision(Character c);

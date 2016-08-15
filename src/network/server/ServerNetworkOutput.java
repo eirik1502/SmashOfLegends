@@ -7,12 +7,12 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.util.ArrayList;
 
-import gameObjects.Bullet;
 import network.CharacterState;
 import network.NetBulletState;
 import network.NetCameraState;
 import network.baseConnection.Host;
-import rooms.Entity;
+import serverGame.Entity;
+import serverGame.entities.Bullet;
 
 public class ServerNetworkOutput {
 

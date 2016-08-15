@@ -1,7 +1,7 @@
 package network.ClientGameObjects;
 
-import game.Game;
 import graphics.Sprite;
+import serverGame.Game;
 
 public class ClientBackground extends ClientEntity {
 

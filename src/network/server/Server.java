@@ -9,14 +9,14 @@ import java.util.concurrent.*;
 
 import org.json.simple.JSONObject;
 
-import game.Game;
-import gameObjects.Bullet;
 import graphics.Camera;
 import network.CharacterState;
 import network.NetBulletState;
 import network.NetCameraState;
 import network.baseConnection.Host;
-import rooms.Entity;
+import serverGame.Entity;
+import serverGame.Game;
+import serverGame.entities.Bullet;
 
 public class Server{
 

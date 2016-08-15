@@ -7,6 +7,7 @@ import network.client.Client;
 import physics.Collideable;
 import physics.PhRectangle;
 import physics.PhShape;
+import serverGame.entities.Enemy;
 
 import static maths.TrigUtils.*;
 
@@ -14,8 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import gameObjects.Enemy;
 
 public abstract class ClientBulletEntity extends ClientEntity {
 

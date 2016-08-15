@@ -9,49 +9,45 @@ import physics.PhShape;
 public abstract class ClientEntity extends GraphicsEntity implements Collideable{
 
 	
+	private Sprite sprite;
 	
 	
 	public ClientEntity(Sprite sprite, float x, float y, float rotation) {
-		super(sprite, x, y, rotation);
+		this.sprite = sprite;
+		sprite.setX(x);
+		sprite.setY(y);
+		sprite.setRotation(rotation);
+		super.addSprite(sprite); //to be drawn
 	}
 	
-	public Sprite getSprite() {
-		return sprite;
-	}
-	
-	public void setCharacterState(CharacterState state) {
-		setX(state.getX());
-    	setY(state.getY());
-    	setRotation(state.getDirection());
-	}
 	
 	public void update() {
 		sprite.update();
 	}
 	
 	public float getX() {
-		return x;
+		return sprite.getX();
 	}
 	public void setX(float x) {
-		this.x = x;
+		sprite.setX(x);
 	}
 	public void addX(float x) {
-		this.x += x;
+		sprite.setX(sprite.getX() + x);
 	}
 	public float getY() {
-		return y;
+		return sprite.getY();
 	}
 	public void setY(float y) {
-		this.y = y;
+		sprite.setY(y);
 	}
 	public void addY(float y) {
-		this.y += y;
+		sprite.setY(sprite.getY() + y);
 	}
 	public float getRotation() {
-		return rotation;
+		return sprite.getRotation();
 	}
 	public void setRotation(float rotation) {
-		this.rotation = rotation;
+		sprite.setRotation(rotation);
 	}
 
 	@Override

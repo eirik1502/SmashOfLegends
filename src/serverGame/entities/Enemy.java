@@ -1,14 +1,14 @@
-package gameObjects;
+package serverGame.entities;
 
-import game.Game;
-import game.GameRoom;
 import graphics.Sprite;
 import maths.TrigUtils;
 import physics.Collideable;
 import physics.PhRectangle;
 import physics.PhShape;
-import rooms.Entity;
 import rooms.Updateable;
+import serverGame.Entity;
+import serverGame.Game;
+import serverGame.ServerGame;
 import userInput.InputState;
 
 public class Enemy extends Entity implements Updateable, Collideable {
@@ -39,7 +39,7 @@ public class Enemy extends Entity implements Updateable, Collideable {
 
 	@Override
 	public void update() {
-		GameRoom groom = (GameRoom)room;
+		ServerGame groom = (ServerGame)room;
 		Character player = groom.getPlayer();
 		
 		float directionToPlayer = TrigUtils.pointDirection(x, y, player.getX(), player.getY());
@@ -60,7 +60,7 @@ public class Enemy extends Entity implements Updateable, Collideable {
 		checkAttack();
 	}
 	private void checkDead() {
-		GameRoom groom = (GameRoom)room;
+		ServerGame groom = (ServerGame)room;
 		if (hp <= 0) {
 			//groom.removeEnemy(this);
 			setHp(100);
@@ -69,7 +69,7 @@ public class Enemy extends Entity implements Updateable, Collideable {
 		}
 	}
 	private void checkAttack() {
-		GameRoom groom = (GameRoom)room;
+		ServerGame groom = (ServerGame)room;
 		Character player = groom.collidePlayer(this);
 		if (player != null) {
 			//groom.gameOver();

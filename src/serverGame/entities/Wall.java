@@ -1,9 +1,9 @@
-package gameObjects;
+package serverGame.entities;
 
 import physics.Collideable;
 import physics.PhRectangle;
 import physics.PhShape;
-import rooms.Entity;
+import serverGame.Entity;
 
 public class Wall extends Entity implements Collideable{
 

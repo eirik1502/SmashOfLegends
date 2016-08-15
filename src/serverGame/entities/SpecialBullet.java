@@ -1,4 +1,4 @@
-package gameObjects;
+package serverGame.entities;
 
 public class SpecialBullet extends Bullet{
 

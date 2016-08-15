@@ -1,4 +1,4 @@
-package network.client;
+package clientGame.net;
 
 
 import java.io.DataOutputStream;
@@ -8,7 +8,7 @@ import network.CharacterState;
 import network.NetBulletState;
 import network.NetCameraState;
 
-public class ClientObjectsState {
+public class ClientGameState {
 
 	
 	private NetCameraState cameraState;
@@ -19,10 +19,10 @@ public class ClientObjectsState {
 	private ArrayList<NetBulletState> bulletsCreatedState;
 	
 	
-	public ClientObjectsState() {
+	public ClientGameState() {
 		this(new NetCameraState(), new CharacterState(), new CharacterState(), new ArrayList<NetBulletState>());
 	}
-	public ClientObjectsState( NetCameraState cameraState, CharacterState player1State, CharacterState player2State, ArrayList<NetBulletState> bulletsCreatedState) {
+	public ClientGameState( NetCameraState cameraState, CharacterState player1State, CharacterState player2State, ArrayList<NetBulletState> bulletsCreatedState) {
 		this.cameraState = cameraState;
 		this.player1State = player1State;
 		this.player2State = player2State;

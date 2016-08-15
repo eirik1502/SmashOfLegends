@@ -1,25 +1,42 @@
 package network.client;
 
 import graphics.Font;
+import graphics.GraphicsEntity;
 import graphics.GraphicsHandeler;
-import rooms.Text;
+import graphics.Sprite;
+import graphics.Text;
+import network.ClientGameObjects.ClientEntity;
 import userInput.InputState;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class IpUserInput {
-
-	
-
-	private GraphicsHandeler graphics;
+public class IpUserInput extends GraphicsEntity {
 	
 
 
+	public IpUserInput(Sprite sprite, float x, float y, float rotation) {
+		super(sprite, x, y, rotation);
+		// TODO Auto-generated constructor stub
+	}
+
+	private Text[] text = new Text[1];
+
 	
-	public IpUserInput(GraphicsHandeler graphics) {
-		this.graphics = graphics;
+
+	
+	@Override
+	public void start() {
+		
 	}
 	
+	
+	public void update() {
+		
+	}
+	
+	public Text[] getTexts() {
+		return text;
+	}
 	
 	public String getInput() {
 		
@@ -31,17 +48,16 @@ public class IpUserInput {
 		final String finalChar = "|";
 		String ipText = "";
 		Text currentText = new Text(constText, Font.getStandardFont(), 18, 300f, 100f, 0);
+		text[0] = currentText;
 
 		int lastKey = -1;
 		int currKey = 0;
 		
 		
-		while(!glfwWindowShouldClose(graphics.getWindow())) {
-			glfwPollEvents();
+		while(true) {
 			
-			currentText.setString(constText + ipText + finalChar);
-			Text[] texts = {currentText};
-			graphics.renderTexts(texts);
+			currentText.setString(constText + ipText + finalChar); //to be rendered
+
 			
 			try {
 				Thread.sleep(16);
@@ -82,6 +98,5 @@ public class IpUserInput {
 			
 		}
 		
-		return "";
 	}
 }

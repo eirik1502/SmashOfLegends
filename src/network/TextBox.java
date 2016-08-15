@@ -3,7 +3,7 @@ package network;
 import java.util.Scanner;
 
 import graphics.Font;
-import rooms.Text;
+import graphics.Text;
 
 
 /**
@@ -109,6 +109,10 @@ public class TextBox {
 	
 	public Text getGraphicsText() {
 		return outputText;
+	}
+	
+	public String getString() {
+		return string.toString();
 	}
 	
 	public void setWidth(float width) {

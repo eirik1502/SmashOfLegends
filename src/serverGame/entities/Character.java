@@ -1,26 +1,25 @@
-package gameObjects;
+package serverGame.entities;
 
 import graphics.Camera;
 import graphics.Font;
 import graphics.Sprite;
+import graphics.Text;
 import maths.TrigUtils;
 import physics.Collideable;
 import physics.PhRectangle;
 import physics.PhShape;
 import physics.PhysicsHandeler;
-import rooms.Entity;
-import rooms.RelevantInputState;
 import rooms.Room;
-import rooms.Text;
 import rooms.Updateable;
+import serverGame.Entity;
+import serverGame.Game;
+import serverGame.ServerGame;
+import serverGame.RelevantInputState;
 import userInput.InputState;
 import static maths.TrigUtils.*;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFW.*;
-
-import game.Game;
-import game.GameRoom;
 
 
 public class Character extends Entity implements Collideable {
@@ -34,12 +33,11 @@ public class Character extends Entity implements Collideable {
 	private int shootTimer = 0;
 	private int shootDelay = 40;
 	
-	private Text text;
-	
-	private Camera camera;
 	
 	private float startX, startY;
-	public GameRoom gameRoom;
+	public ServerGame game;
+	
+	private RelevantInputState inputState;
 	
 
 	public Character( float startX, float startY ) {
@@ -57,20 +55,20 @@ public class Character extends Entity implements Collideable {
 		//getSprite().setOnAnimationEnd(sprite->{sprite.setImageSpeed(0);});
 	}
 	
-	public void setCamera(Camera camera) {
-		this.camera = camera;
-	}
 	
-	@Override
 	public void start() {
-		gameRoom = (GameRoom)super.room;
+		
 	}
 	
 
-	public void update(RelevantInputState is) {
+	public void setRelevantInputState(RelevantInputState is) {
+		inputState = is;
+	}
+	
+	public void update() {
 		super.update();
 		
-		GameRoom groom = (GameRoom)room;
+		ServerGame groom = (ServerGame)room;
 		
 		float lastX = x;
 		float lastY = y;
