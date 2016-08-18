@@ -1,4 +1,4 @@
-package network.server;
+package serverGame.net;
 
 
 import java.io.DataOutputStream;
@@ -8,7 +8,7 @@ import network.CharacterState;
 import network.NetBulletState;
 import network.NetCameraState;
 
-public class ServerObjectsState {
+public class GameStateNet {
 
 	
 	private NetCameraState camera1State, camera2State;
@@ -17,10 +17,10 @@ public class ServerObjectsState {
 	private ArrayList<NetBulletState> bulletsCreatedState;
 	
 	
-	public ServerObjectsState() {
+	public GameStateNet() {
 		this(new NetCameraState(), new NetCameraState(), new CharacterState(), new CharacterState(), new ArrayList<NetBulletState>());
 	}
-	public ServerObjectsState( NetCameraState camera1State, NetCameraState camera2State, CharacterState player1State, CharacterState player2State, ArrayList<NetBulletState> bulletsCreatedState) {
+	public GameStateNet( NetCameraState camera1State, NetCameraState camera2State, CharacterState player1State, CharacterState player2State, ArrayList<NetBulletState> bulletsCreatedState) {
 		this.camera1State = camera1State;
 		this.camera2State = camera2State;
 		this.player1State = player1State;

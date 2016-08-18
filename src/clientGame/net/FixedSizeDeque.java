@@ -14,6 +14,10 @@ public class FixedSizeDeque<T> implements Iterable<T>{
 		maxSize = size;
 	}
 	
+	public int getFixedSize() {
+		return maxSize;
+	}
+	
 	public void add(T e) {
 		if (queue.size() >= maxSize) queue.poll();
 		queue.add(e);

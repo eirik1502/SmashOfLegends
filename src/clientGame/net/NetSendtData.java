@@ -8,6 +8,9 @@ public class NetSendtData {
 	private NetOutData data;
 	private boolean isAcked = false;
 	
+	public NetSendtData() {
+		this(new NetOutData() );
+	}
 	public NetSendtData(NetOutData data) {
 		this.data = data;
 	}

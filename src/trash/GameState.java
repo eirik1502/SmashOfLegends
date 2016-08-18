@@ -1,4 +1,4 @@
-package serverGame.net;
+package trash;
 
 import java.io.DataOutputStream;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import network.CharacterState;
 import network.NetBulletState;
 
-public class ObjectsState {
+public class GameState {
 
 	private CharacterState player1State, player2State;
 	
@@ -14,10 +14,10 @@ public class ObjectsState {
 	private ArrayList<NetBulletState> bulletsCreatedState;
 	
 	
-	public ObjectsState() {
+	public GameState() {
 		this(new CharacterState(), new CharacterState(), new ArrayList<NetBulletState>());
 	}
-	public ObjectsState( CharacterState player1State, CharacterState player2State, ArrayList<NetBulletState> bulletsCreatedState) {
+	public GameState( CharacterState player1State, CharacterState player2State, ArrayList<NetBulletState> bulletsCreatedState) {
 
 		this.player1State = player1State;
 		this.player2State = player2State;

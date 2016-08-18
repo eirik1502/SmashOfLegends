@@ -98,6 +98,7 @@ public class SingleHostNet {
 		this.inTcpDataListener.onNetDataReceived(data);
 	}
 	private synchronized void onUdpDataReceive(NetInData data) {
+		
 		this.inUdpDataListener.onNetDataReceived(data);
 	}
 }

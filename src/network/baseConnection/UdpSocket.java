@@ -66,11 +66,13 @@ public class UdpSocket extends Thread {
 				bytes = new byte[MAX_DATAGRAM_SIZE];
 				receivePacket = new DatagramPacket(bytes, bytes.length);
 				socket.receive( receivePacket ); //stop and wait
-				//i think receivePacket.etData just returns 'bytes', not actual bytes
-				bytes = Arrays.copyOfRange(bytes, 0, receivePacket.getLength());
-				//System.out.println("udp read byte size: " + bytes.length);
-
-				onInput(bytes);
+				if (receivePacket.getAddress().equals(connectedTo.getAddress()) && receivePacket.getPort() == connectedTo.getUdpPort()) {
+					//if sender is the one we're connected to
+					bytes = Arrays.copyOfRange(bytes, 0, receivePacket.getLength());
+					//System.out.println("udp read byte size: " + bytes.length);
+	
+					onInput(bytes);
+				}
 			}
 		
 		}

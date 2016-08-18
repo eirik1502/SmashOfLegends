@@ -3,6 +3,7 @@ package network.baseConnection;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class NetInData {
 
@@ -103,6 +104,6 @@ public class NetInData {
 	
 	@Override
 	public String toString() {
-		return "[NetInData, bytes: "+byteSize()+"]";
+		return "[NetInData, size: "+byteSize()+" bytes, bytes: " + Arrays.toString(dataIn.) " ]";
 	}
 }

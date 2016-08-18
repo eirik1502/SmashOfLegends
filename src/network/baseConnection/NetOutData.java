@@ -3,6 +3,7 @@ package network.baseConnection;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class NetOutData {
 
@@ -27,12 +28,29 @@ public class NetOutData {
 		}
 	}
 	
+	public void writeData(NetOutData data) {
+		try {
+			dataOut.write(data.getBytes());
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void writeByte(byte b) {
 		try {
 			dataOut.writeByte(b);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new IllegalStateException("io socket might be closed");
+		}
+	}
+	public void writeBytes(byte[] bytes) {
+		try {
+			dataOut.write(bytes);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	public void writeInt(int i) {
@@ -84,5 +102,10 @@ public class NetOutData {
 	}
 	public byte[] getBytes() {
 		return byteOut.toByteArray();
+	}
+	
+	public String toString() {
+		byte[] bytes = getBytes();
+		return Arrays.toString(bytes);
 	}
 }

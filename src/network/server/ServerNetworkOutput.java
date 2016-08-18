@@ -13,6 +13,7 @@ import network.NetCameraState;
 import network.baseConnection.Host;
 import serverGame.Entity;
 import serverGame.entities.Bullet;
+import serverGame.net.GameStateNet;
 
 public class ServerNetworkOutput {
 
@@ -28,7 +29,7 @@ public class ServerNetworkOutput {
 	}
 	
 	
-	public void sendObjectsState(ServerObjectsState states) {
+	public void sendObjectsState(GameStateNet states) {
 		NetCameraState[] camerasState = {states.getCamera1State(), states.getCamera2State() };
 		CharacterState p1s = states.getPlayer1State();
 		CharacterState p2s = states.getPlayer2State();

@@ -17,6 +17,7 @@ import network.baseConnection.Host;
 import serverGame.Entity;
 import serverGame.Game;
 import serverGame.entities.Bullet;
+import serverGame.net.GameStateNet;
 
 public class Server{
 
@@ -121,7 +122,7 @@ public class Server{
 	    
 	    	
     	if (this.sendStateCounter++ == 1) { //2    updates 20 times a second
-    	    ServerObjectsState objectsState = convertToObjectsState(game.getCameras(), game.getEntities(), game.pollCreatedBullets());
+    	    GameStateNet objectsState = convertToObjectsState(game.getCameras(), game.getEntities(), game.pollCreatedBullets());
     	    networkOutput.sendObjectsState(objectsState );
     		messagesSendt++;
     		sendStateCounter = 0;
@@ -130,7 +131,7 @@ public class Server{
     }
     
 
-    private ServerObjectsState convertToObjectsState(Camera[] cameras, Entity[] entities, Bullet[] createdBullets) {
+    private GameStateNet convertToObjectsState(Camera[] cameras, Entity[] entities, Bullet[] createdBullets) {
     	
     	Entity player1 = entities[0];
 		Entity player2 = entities[1];
@@ -146,7 +147,7 @@ public class Server{
 	    	bulletsState.add( new NetBulletState(bul.getTypeNumber(), bul.getX(), bul.getY(), bul.getRotation(), bul.getSpeed()) );
 	    }
     	
-    	return new ServerObjectsState(camera1State, camera2State, player1State, player2State, bulletsState);
+    	return new GameStateNet(camera1State, camera2State, player1State, player2State, bulletsState);
     }
     
     /**
