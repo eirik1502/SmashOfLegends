@@ -104,6 +104,6 @@ public class NetInData {
 	
 	@Override
 	public String toString() {
-		return "[NetInData, size: "+byteSize()+" bytes, bytes: " + Arrays.toString(dataIn.) " ]";
+		return "[NetInData, size: "+byteSize()+" bytes]";
 	}
 }

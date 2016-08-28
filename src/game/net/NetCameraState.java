@@ -1,4 +1,4 @@
-package network;
+package game.net;
 
 public class NetCameraState {
 

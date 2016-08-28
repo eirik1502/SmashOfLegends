@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import clientGame.net.ClientGameState;
-import network.CharacterState;
-import network.NetBulletState;
-import network.NetCameraState;
+import game.net.CharacterState;
+import game.net.NetBulletState;
+import game.net.NetCameraState;
 import network.server.Server;
 import utils.LogWriter;
 

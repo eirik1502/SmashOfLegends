@@ -8,9 +8,6 @@ import graphics.GraphicsHandeler;
 import graphics.GraphicsUtils;
 import graphics.Sprite;
 import graphics.Text;
-import network.CharacterState;
-import network.NetBulletState;
-import network.NetCameraState;
 import network.ClientGameObjects.ClientBackground;
 import network.ClientGameObjects.ClientBulletEntity;
 import network.ClientGameObjects.ClientCharacterEntity;
@@ -42,7 +39,11 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import clientGame.IpUserInput;
 import clientGame.net.ClientGameState;
+import game.net.CharacterState;
+import game.net.NetBulletState;
+import game.net.NetCameraState;
  
 public class Client {
 

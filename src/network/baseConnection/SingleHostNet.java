@@ -1,6 +1,7 @@
 package network.baseConnection;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.DatagramSocket;
 import java.net.Socket;
 
@@ -22,11 +23,19 @@ public class SingleHostNet {
 		this.udpSocket = udpSocket;
 	}
 	
-	public static SingleHostNet createServerConnection(Host serverHost) { //host does not need udp port set
+	public static SingleHostNet createServerConnection(Host serverHost){ //host does not need udp port set, will be set after this
 		try {
-			Socket socket = new Socket(serverHost.getAddress(), serverHost.getTcpPort()); //connecting
-			DatagramSocket datagramSocket = new DatagramSocket(socket.getLocalPort()); //assign tcp local port as udp local port
+			Host myServerHost = new Host(serverHost.getAddress(), serverHost.getTcpPort(), -1);
+			
+			Socket socket = new Socket(myServerHost.getAddress(), myServerHost.getTcpPort()); //connecting
+			DatagramSocket datagramSocket = new DatagramSocket();
+			//if more than one socket is created with same port, we cannot use that as udp port on a single machine
 			TcpSocket tcpSocket = new TcpSocket(socket);
+			
+			NetOutData udpPortData = new NetOutData();
+			System.out.println("Client sending udp port: " + datagramSocket.getLocalPort());
+			udpPortData.writeInt(datagramSocket.getLocalPort());
+			tcpSocket.send(udpPortData); //sending udp port data
 			
 			//timeout in case server do not answer
 			TimerThread requestTimeout = new TimerThread(500, () -> {
@@ -46,10 +55,13 @@ public class SingleHostNet {
 			requestTimeout.terminate(); //connection made
 			System.out.println("Client received udp port: " + responseUdpPort);
 			
-			serverHost.setUdpPort(responseUdpPort);
+			myServerHost.setUdpPort(responseUdpPort);
 			//datagramSocket.connect(socket.getInetAddress(), responseUdpPort);
-			UdpSocket udpSocket = new UdpSocket(datagramSocket, serverHost);
+			UdpSocket udpSocket = new UdpSocket(datagramSocket, myServerHost);
 			return new SingleHostNet(tcpSocket, udpSocket);
+		}
+		catch (ConnectException e) {
+			return null; //connection could not be made
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -100,5 +112,13 @@ public class SingleHostNet {
 	private synchronized void onUdpDataReceive(NetInData data) {
 		
 		this.inUdpDataListener.onNetDataReceived(data);
+	}
+	
+	
+	public TcpSocket getTcpSocket() {
+		return tcpSocket;
+	}
+	public UdpSocket getUdpSocket() {
+		return udpSocket;
 	}
 }

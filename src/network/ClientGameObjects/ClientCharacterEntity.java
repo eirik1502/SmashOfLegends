@@ -1,7 +1,7 @@
 package network.ClientGameObjects;
 
+import game.net.CharacterState;
 import graphics.Sprite;
-import network.CharacterState;
 import physics.PhRectangle;
 import physics.PhShape;
 

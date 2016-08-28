@@ -3,8 +3,8 @@ package trash;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 
-import network.CharacterState;
-import network.NetBulletState;
+import game.net.CharacterState;
+import game.net.NetBulletState;
 
 public class GameState {
 

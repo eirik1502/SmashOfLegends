@@ -1,8 +1,8 @@
 package network.ClientGameObjects;
 
+import game.net.CharacterState;
 import graphics.GraphicsEntity;
 import graphics.Sprite;
-import network.CharacterState;
 import physics.Collideable;
 import physics.PhShape;
 

@@ -1,8 +1,6 @@
 package network.ClientGameObjects;
 
 import graphics.Sprite;
-import network.CharacterState;
-import network.NetBulletState;
 import network.client.Client;
 import physics.Collideable;
 import physics.PhRectangle;
@@ -15,6 +13,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import game.net.CharacterState;
+import game.net.NetBulletState;
 
 public abstract class ClientBulletEntity extends ClientEntity {
 

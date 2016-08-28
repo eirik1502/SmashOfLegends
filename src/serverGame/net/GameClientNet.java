@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import clientGame.net.ClientGameState;
+import game.net.CharacterState;
 import game.net.GameNet;
+import game.net.NetBulletState;
+import game.net.NetCameraState;
 import game.net.SecureUdpNet;
-import network.CharacterState;
-import network.NetBulletState;
-import network.NetCameraState;
 import network.TimerThread;
 import network.baseConnection.NetInData;
 import network.baseConnection.NetOutData;
@@ -28,9 +28,9 @@ public class GameClientNet {
 	
 	private SecureUdpNet udpSecureNet;
 	
-	private ConcurrentLinkedDeque<ClientInput> inDataInputBuffer = new ConcurrentLinkedDeque();
-	
+	private ConcurrentLinkedDeque<ClientInput> inDataInputBuffer = new ConcurrentLinkedDeque<>();
 	private ClientInput lastInput = new ClientInput();
+	
 	private TimerThread clientsTimeoutTimer;
 	 
 	 
@@ -45,6 +45,7 @@ public class GameClientNet {
 	public ClientInput pollInputState() {
 		int bufferCount = inDataInputBuffer.size();
 		if (bufferCount == 0) {
+			System.err.println("No new input available");
 			return lastInput;
 		}
 		
@@ -60,6 +61,9 @@ public class GameClientNet {
 			System.err.println("Got non-game data from client ingame");
 			return;
 		}
+		
+		System.out.println("Got game data");
+		
 		addInputBuffer( dataToClientInput(data) );
 	}
 	
@@ -91,6 +95,7 @@ public class GameClientNet {
 	}
 	
 	private void sendData(NetOutData data) {
+		System.out.println("GameClientNet sending data: " + data);
 		udpSecureNet.sendData(data);
 	}
 	
@@ -107,19 +112,19 @@ public class GameClientNet {
 	}
 	
 	private static NetOutData[] gameStateToData(GameStateNet state) {
+		int clientCount = 2;
 		NetCameraState[] camerasState = {state.getCamera1State(), state.getCamera2State() };
 		CharacterState p1s = state.getPlayer1State();
 		CharacterState p2s = state.getPlayer2State();
 		ArrayList<NetBulletState> createdBulletsState = state.getBulletsCreatedState();
 		
 		try {
-			ByteArrayOutputStream postByteStream = new ByteArrayOutputStream(Server.SEND_GAME_DATA_BYTE_SIZE_MAX-9);
+			ByteArrayOutputStream postByteStream = new ByteArrayOutputStream(GameNet.SEND_GAME_DATA_BYTE_SIZE_MAX-9);
 			ByteArrayOutputStream preByteStream = new ByteArrayOutputStream(9);
         	DataOutputStream postOut = new DataOutputStream( postByteStream );
         	DataOutputStream preOut = new DataOutputStream( preByteStream );
         	
         	//postOut, general for both clients, preOut special for the clients + mesg type
-        	preOut.writeByte(1); //type
         	
         	postOut.writeFloat(p1s.getX());
         	postOut.writeFloat(p1s.getY());
@@ -140,14 +145,12 @@ public class GameClientNet {
         	}
         	
     		NetOutData[] resData = {new NetOutData(), new NetOutData()};
-	    	for (int i = 0; i < Server.TOTAL_CLIENT_COUNT; i++) {
+	    	for (int i = 0; i < clientCount; i++) {
 	    		preOut.writeByte(1); //msgType
 	    		preOut.writeFloat(camerasState[i].getX());
 	    		preOut.writeFloat(camerasState[i].getY());
 	    		preOut.write( postByteStream.toByteArray() );
 	    		byte[] bytes = preByteStream.toByteArray();
-	    		//System.out.println(bytes[0]);
-	    		
 	    		resData[i].writeBytes(bytes);
 	    		preByteStream.reset();
 	    	}

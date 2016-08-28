@@ -1,8 +1,8 @@
 package network.ClientGameObjects;
 
+import game.net.CharacterState;
+import game.net.NetBulletState;
 import graphics.Sprite;
-import network.CharacterState;
-import network.NetBulletState;
 import network.client.Client;
 import serverGame.entities.BasicBullet;
 

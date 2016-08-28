@@ -143,5 +143,14 @@ public class TcpSocket extends Thread {
 		
 	}
 	
+	public String getAddress() {
+		return socket.getInetAddress().getHostAddress();
+	}
+	public int getPort() {
+		return this.socket.getPort();
+	}
+	public int getLocalPort() {
+		return socket.getLocalPort();
+	}
 
 }

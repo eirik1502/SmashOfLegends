@@ -1,4 +1,4 @@
-package network;
+package game.net;
 
 public class NetBulletState extends CharacterState {
 
@@ -14,5 +14,10 @@ public class NetBulletState extends CharacterState {
 	
 	public byte getBulletNumber() {
 		return no;
+	}
+	
+	
+	public boolean equals(NetBulletState s) {
+		return (s.getBulletNumber() == no && s.getX() == getX() && s.getY() == getY() && s.getDirection() == getDirection() && s.getSpeed() == getSpeed());
 	}
 }

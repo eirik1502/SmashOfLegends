@@ -41,12 +41,13 @@ public class Host {
 	public InetAddress getAddress() {
 		return address;
 	}
-	public void setAddress(String address) {
+	public boolean setAddress(String address) {
 		try {
 			this.address = InetAddress.getByName(address);
+			return true;
 
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			return false;
 		}
 	}
 	

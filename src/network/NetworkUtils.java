@@ -4,6 +4,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import game.net.CharacterState;
+
 public class NetworkUtils {
 
 	private NetworkUtils() {

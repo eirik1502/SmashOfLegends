@@ -7,11 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import game.net.CharacterState;
 import game.net.GameNet;
+import game.net.NetBulletState;
+import game.net.NetCameraState;
 import game.net.SecureUdpNet;
-import network.CharacterState;
-import network.NetBulletState;
-import network.NetCameraState;
 import network.TimerThread;
 import network.baseConnection.NetInData;
 import network.baseConnection.NetOutData;

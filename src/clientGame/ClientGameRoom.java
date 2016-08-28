@@ -1,37 +1,40 @@
 package clientGame;
 
-import rooms.Room;
+import clientGame.net.ClientGameNet;
 
-public class LobbyRoom extends NetRoom {
+public class ClientGameRoom extends NetRoom {
+
+
+	private ClientGameNet gameNet;
 	
 	
-
-	public LobbyRoom() {
+	public ClientGameRoom() {
 		super(ClientMain.WINDOW_WIDTH, ClientMain.WINDOW_HEIGHT);
 	}
-
+	
+	
 	@Override
 	public void load() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void start() {
-		
+		gameNet = new ClientGameNet( super.getServerConnection() );
 		
 	}
 
 	@Override
 	public void stop() {
-		// TODO Auto-generated method stub
+		gameNet = null;
 		
 	}
 
 	@Override
 	public void unload() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
+	
 }

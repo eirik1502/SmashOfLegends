@@ -1,4 +1,4 @@
-package network;
+package game.net;
 
 public class CharacterState {
 
@@ -27,6 +27,11 @@ public class CharacterState {
 		return speed;
 	}
 	
+	public boolean equals(CharacterState s) {
+		return (s.getX() == x && s.getY() == y && s.getDirection() == direction && s.getSpeed() == speed);
+	}
+	
+	@Override
 	public String toString() {
 		return "[CharacterState, x: "+getX()+" y: "+getY()+" dir: "+getDirection()+" speed: "+getSpeed()+"]";
 	}

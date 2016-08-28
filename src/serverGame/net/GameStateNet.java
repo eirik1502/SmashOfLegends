@@ -4,9 +4,9 @@ package serverGame.net;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 
-import network.CharacterState;
-import network.NetBulletState;
-import network.NetCameraState;
+import game.net.CharacterState;
+import game.net.NetBulletState;
+import game.net.NetCameraState;
 
 public class GameStateNet {
 

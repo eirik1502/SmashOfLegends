@@ -9,10 +9,10 @@ import java.util.concurrent.*;
 
 import org.json.simple.JSONObject;
 
+import game.net.CharacterState;
+import game.net.NetBulletState;
+import game.net.NetCameraState;
 import graphics.Camera;
-import network.CharacterState;
-import network.NetBulletState;
-import network.NetCameraState;
 import network.baseConnection.Host;
 import serverGame.Entity;
 import serverGame.Game;

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+import game.net.CharacterState;
 import game.net.GameNet;
+import game.net.NetBulletState;
+import game.net.NetCameraState;
 import game.net.SecureUdpNet;
-import network.CharacterState;
-import network.NetBulletState;
-import network.NetCameraState;
 import network.baseConnection.NetInData;
 import network.baseConnection.NetOutData;
 import network.baseConnection.SingleHostNet;

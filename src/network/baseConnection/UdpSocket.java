@@ -43,6 +43,7 @@ public class UdpSocket extends Thread {
 		try {
 			//byte msgSize = data.getByteSize();
 			DatagramPacket packet = new DatagramPacket(data.getBytes(), data.getByteSize(), connectedTo.getAddress(), connectedTo.getUdpPort());
+			System.out.println("Udp port sending to: " + connectedTo );
 			socket.send(packet);
 		}
 		catch (IOException e) {
@@ -90,5 +91,14 @@ public class UdpSocket extends Thread {
 		
 	}
 	
+	public String getAddress() {
+		return connectedTo.getAddress().getHostAddress();
+	}
+	public int getPort() {
+		return connectedTo.getUdpPort();
+	}
+	public int getLocalPort() {
+		return socket.getLocalPort();
+	}
 
 }
